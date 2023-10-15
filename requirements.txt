@@ -1,0 +1,8 @@
+langchain
+openai
+python-dotenv
+requests 
+duckduckgo-search
+bs4
+pandas
+tabulate
