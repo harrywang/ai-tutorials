@@ -1,0 +1,160 @@
+
+
+
+
+
+
+
+
+
+
+
+
+CloseSea - the Smallest NFT Marketplace | harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Open menu
+
+
+
+
+
+
+
+
+
+
+                    Home
+                
+
+
+
+                        About
+                    
+
+
+                        Blog
+                    
+
+
+
+
+
+June 9, 2022
+CloseSea - the Smallest NFT Marketplace
+
+
+
+tutorial
+
+
+open-source
+
+
+
+I developed and deployed CloseSea: the smallest NFT marketplace :) based on the great tutorial by Nader Dabit.
+I added a few things on top of Nader’s tutorial:
+
+how to add NFT traits in metadata and how they will be displayed on OpenSea
+how to manage the contract as a owner, e.g., change the listing fee and withdraw the money from the contract address
+how to verify the contract, estimate gas, and deploy the app to Vercel
+
+You can play with the demo at https://closesea-one.vercel.app/, which uses the contract deployed on Rinkeby - you need to connect your wallet, switch to Rinkeby network, and use test Rinkeby eth to list and trade.
+The listed/minted NFTs can be seen at https://testnets.opensea.io/collection/closesea-collection.
+The code and docs can be accessed at Repo.
+The followings are used in this project:
+
+Solidity
+Hardhat
+Alchemy
+Rinkeby/Mumbai/Polygon
+OpenZeppelin
+Ethers.js
+Next.js
+TailwindCSS
+
+Screenshots
+Landing Page:
+
+Manage Contract Page:
+
+Collection on OpenSea:
+
+Traits on OpenSea:
+
+PS. The image for this post is generated via Midjourney using the prompt “ocean with popular nft images floating around”.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      © 
+
+        Powered by Tailpages
+      
+
+
+
+
+
+
+

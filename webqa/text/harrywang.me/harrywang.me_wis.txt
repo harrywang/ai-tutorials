@@ -1,0 +1,153 @@
+
+
+
+
+
+
+
+
+
+
+
+
+A Web3 Fullstack DApp | harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Open menu
+
+
+
+
+
+
+
+
+
+
+                    Home
+                
+
+
+
+                        About
+                    
+
+
+                        Blog
+                    
+
+
+
+
+
+April 1, 2022
+A Web3 Fullstack DApp
+
+
+
+tutorial
+
+
+open-source
+
+
+I developed a simple web3 DApp over the Spring Break and deployed it at 
+https://www.writteninstone.xyz. The project is fully open-sourced and you can learn more about it here. I am working on a training tutorial based on this project - stay tuned :).
+The followings are used in this project:
+
+Solidity
+Hardhat
+Alchemy
+Mumbai/Polygon
+OpenZeppelin
+Ethers.js
+Next.js
+TailwindCSS
+
+See a carved message at PolygonScan
+
+Some screenshots:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      © 
+
+        Powered by Tailpages
+      
+
+
+
+
+
+
+

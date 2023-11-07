@@ -1,0 +1,254 @@
+
+
+
+
+
+
+
+
+
+
+
+
+Manage Long-running Python Tasks using JupyterHub on Remote Ubuntu Server | harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Open menu
+
+
+
+
+
+
+
+
+
+
+                    Home
+                
+
+
+
+                        About
+                    
+
+
+                        Blog
+                    
+
+
+
+
+
+August 5, 2022
+Manage Long-running Python Tasks using JupyterHub on Remote Ubuntu Server
+
+
+
+tutorial
+
+
+open-source
+
+
+coding
+
+
+
+I recently re-configured my Ubuntu server with JupyterHub so that I can manage a long-running Python task with a large dataset, which cannot be handled by my MacBook Pro. I spent quite some time figuring out how to do certain things right and decide to write it down before I forget.
+The task was a sentiment analysis of ~1.4 million hotel reviews using our fine-tuned model based on Erlangshen-Roberta-330M-Sentiment, which took about 10 days to complete using my old CPU server. I developed a simplified version of the program to demo in this tutorial.
+The data and code can be found in this repo.
+The following are the key parts:
+
+install JupyterHub on the server
+install pyenv to manage different versions of Python
+setup and add virtual environments to ipykernel so that they are accessible from JupyterLab
+use a HuggingFace model to do a zero-shot sentiment analysis
+run a long-running Python task without keeping the terminal open and with logging and email notification
+check GPU usages and terminate tasks
+
+JupyterHub Setup and SFTP
+Our system admin used this tutorial to set up the JupyterHub and added my account to the sudo group.
+For small files, I just use JupyterLab interface to upload them to the server. For large files, I use FileZilla to upload.
+Python Versions
+Different python versions might be needed for different projects. I use pyenv to manage Python versions. The following is my note for setting up pyenv on Ubuntu server, refer to my Mac tutorial if needed.
+ssh hjwang@128.175.21.xxx  # ssh to the remote server
+sudo apt update -y  # update apt
+sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git  # install dependencies
+git clone https://github.com/pyenv/pyenv.git ~/.pyenv  # clone the repo
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc  # setup environment
+echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc  # setup environment
+echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n eval "$(pyenv init -)"\nfi' >> ~/.bashrc  # setup environment
+exec "$SHELL"  # restart the shell
+pyenv install --list  # available versions to install 
+pyenv versions  # installed versions
+pyenv install 3.9.1  # install a Python version
+pyenv global 3.9.1  # set global python version to use
+
+Now if I type python, I see Python 3.9.1:
+Python 3.9.1 (default, Aug  5 2022, 16:07:24) 
+[GCC 7.5.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> 
+
+Virtual Environments
+Setup and activate a virtual environment (here I put all virtual environments in the folder venv and this sample one is named ml):
+python -m venv venv/ml
+source venv/ml/bin/activate
+
+Next, while the virtual environment is activated, we need to add it to ipykernel so that we can access it via JupyterLab:
+pip install ipykernel
+sudo env "PATH=$PATH VIRTUAL_ENV=$VIRTUAL_ENV" python -m ipykernel install --name=ml
+
+Then, you can use jupyter kernelspec list to check all available kernels and remove the corresponding folder to delete the kernel if needed.
+Now, the new virtual environment (kernel) can be used when creating new notebooks:
+
+Long-running Python Tasks
+
+create a virtual environment and install the packages specified in requirements.txt:
+
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+
+create a .env file in the root of the project folder to store the environment variables the program needs - setup the SendGrid API key and from/to emails in your SendGrid account:
+
+SENDGRID_API_KEY='SG.t1o-xxxx'
+FROM_EMAIL='your_from_email'
+TO_EMAIL='your_to_email'
+
+
+
+the sample hotel review text (in Chinese) csv is provided here
+
+
+the sample python sentiment analysis script is here
+
+
+The program will calculate the sentiment of each review and generate a new csv file as the result. The small sample has only 500 rows. The processed result is saved every 100 rows and an email notification is sent out every 200 rows.
+I use this program to show:
+
+how to call a HuggingFace model (NOTE: if the repo is private, you must get a token from HuggingFace and run huggingface-cli login with token first and the code also needs to be changed to use token - see my inline comments for details).
+how to log the result using Python logging
+how to send out email notifications using SendGrid (you need to get an API token)
+
+To run the program in the background, you can ssh to the server or use the terminal from JupyterLab, activate the virtual environment, then execute:
+nohup python sentiment-analysis.py &
+
+& asks the terminal to return control to you immediately and allows the command to complete in the background (source).
+The program will keep on running even if you close the terminal or close JupyterLab.
+Two files will be generated:
+
+log.txt has the logging info - note that the timestamp is added automatically.
+
+INFO: 08/05/2022 06:44:49 data loaded
+INFO: 08/05/2022 06:44:55 model loaded
+...
+
+
+nohup.out will have all outputs of the print() function.
+
+Three email notifications will also be sent:
+
+The logging and email notifications are very useful for long-running tasks so that I know the program is still working fine or from where to restart if something went wrong.
+Terminate Programs
+Sometimes you may want to terminate a running program for whatever reasons, e.g., the program is taking too much GPU and you need to release the GPU resources.
+You can check GPU usage using nvtop: install the package using sudo apt install nvtop and then run nvtop
+You can list all processes by user name using ps -u [username], such as:
+ps -u hjwang
+  PID TTY          TIME CMD
+ 3558 ?        00:00:02 sshd
+ 3559 pts/0    00:00:00 bash
+ 4592 ?        00:00:00 sshd
+ 4593 ?        00:00:00 sftp-server
+ 5060 pts/0    00:00:00 ps
+ 5707 ?        00:00:00 systemd
+ 5708 ?        00:00:00 (sd-pam)
+ 5720 ?        00:02:32 jupyterhub-sing
+22112 ?        01:17:52 python
+
+then you can terminate a process using its ID: kill 22112 (gracefully) or kill -9 22112 (forcefully and immediately)
+ps means process status:
+
+-e: view all the running processes
+-f: view full-format listing
+
+| pipe a command that lets you use two or more commands such that output of one command serves as input to the next. grep is a command-line utility for searching plain-text data sets for lines that match a regular expression.
+ps -ef | grep python can be use to show all running processes with python.
+PS. The image for this post is generated via Midjourney using the prompt “a giant cloud server in matrix calculating difficult problems”.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      © 
+
+        Powered by Tailpages
+      
+
+
+
+
+
+
+

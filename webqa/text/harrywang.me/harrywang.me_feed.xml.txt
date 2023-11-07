@@ -1,0 +1,1630 @@
+Jekyll2023-10-31T19:25:19+00:00https://harrywang.github.io/feed.xmlharrywang.meHarry Wang's Personal WebsiteHarry WangMVP (large language Model + Vector database + Prompt engineering)2023-07-14T00:00:00+00:002023-07-14T00:00:00+00:00https://harrywang.github.io/mvp<p><img class="mx-auto" src="https://github.com/harrywang/harrywang.github.io/assets/595772/ae56ce52-ef76-49ba-b9fa-811a75e24963" /></p>
+
+<p>Update (10/7/2023): I revised another “ChatPDF” app using LangChain and Qdrant <a href="https://github.com/harrywang/pdf-ai-assistant">here</a>.</p>
+
+<p>I revised the <a href="https://github.com/openai/openai-cookbook/tree/main/apps/chatbot-kickstarter">sample chatbot kickstarter app</a> developed by <a href="https://www.linkedin.com/in/colin-jarvis-50019658/">Colin Jarvis</a> from OpenAI, which shows how you can create apps (Q&amp;A and Chatbot) using ChatGPT and your own data.</p>
+
+<p>I created a new acronym for this common architecture used for ChatGPT-based apps:</p>
+
+<blockquote>
+  <p>MVP: M (large language Model) + V (Vector database) + P (Prompt engineering)</p>
+</blockquote>
+
+<p>If a fine-tuned LLM is used, then it is FMVP (Fine-tuned MVP).</p>
+
+<p>My revised code repo with setup instructions is <a href="https://github.com/harrywang/chatbot-kickstarter">here</a>.</p>
+
+<h2 id="data">Data</h2>
+
+<p>I used the rulebooks from NBA and IFAB for the demo.</p>
+
+<ul>
+  <li><a href="https://ak-static.cms.nba.com/wp-content/uploads/sites/4/2022/10/Official-Playing-Rules-2022-23-NBA-Season.pdf">NBA Official Rulebook 2022-23 </a></li>
+  <li><a href="https://www.theifab.com/laws-of-the-game-documents/">IFAB (International Football Association Board) Laws of the Game 2023-2024</a> - I removed all images in the PDF to reduce the file size.</li>
+</ul>
+
+<p>If you want to use other data, just put the PDF files in <code class="language-plaintext highlighter-rouge">data</code> folder.</p>
+
+<h2 id="key-steps">Key Steps</h2>
+
+<p>I list the basic steps of the development workflow below - many of the steps have nothing to do with ChatGPT:</p>
+
+<p>Preparation:</p>
+
+<ul>
+  <li>Split documents (PDF files in this example, which are extracted into text files) into chunks (300 in this example)</li>
+  <li>Get the text embeddings of the chunks (OpenAI <code class="language-plaintext highlighter-rouge">text-embedding-ada-002</code> is used but this can be replaced by any text embedding API/Package)</li>
+  <li>Store the chunks in the vector database (Redis is used but we used <a href="https://milvus.io/">Milvus</a> and <a href="https://qdrant.tech/">Qdrant</a> in production).</li>
+</ul>
+
+<p>Q&amp;A (single-turn chat via <a href="https://platform.openai.com/docs/api-reference/completions">Completion endpoint</a>):</p>
+
+<ul>
+  <li>Get user query (such as ‘what is a penalty kick’) and generate the text embedding of the query</li>
+  <li>Use the query embedding to search for text chunk embeddings stored in the vector database and get the Top N search results</li>
+  <li>Ask ChatGPT to answer the question based on the Top N search results and summarize it using a bulleted list - this is the prompt engineering part</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>summary_prompt = '''Summarise this result in a bulleted list to answer the search query a customer has sent.
+Search query: SEARCH_QUERY_HERE
+Search result: SEARCH_RESULT_HERE
+Summary:
+'''
+</code></pre></div></div>
+
+<p>Chatbot (multi-turn chat via <a href="https://platform.openai.com/docs/api-reference/chat">Chat Completion endpoint</a>):</p>
+
+<ul>
+  <li>Use the system prompt to guide the behavior of the ChatGPT, such as telling the role of the Chatbot as a sports knowledge base assistant</li>
+  <li>Use the system prompt to tell ChatGPT to ask for the type of sport if not presented in the query</li>
+  <li>Use the system prompt to say a trigger word/phase (“searching for answers” in this demo) for downstream tasks (search the vector database for answers - this could be anything, e.g., book a dinner, post to Instagram, do a Google search)</li>
+  <li>All previous messages are appended to the next API call to ChatGPT to provide context</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>system_prompt = '''
+You are a helpful sports knowledge base assistant. You need to capture a Question and Sport from each customer.
+The Question is their query on sports rules, and the Sport should be either basketball or soccer.
+Think about this step by step:
+- The user will ask a Question
+- You will ask them for the Sport if their question didn't include a Sport
+- Once you have the Sport, say "searching for answers".
+
+Example:
+
+User: I'd like to know how many players are on each team
+
+Assistant: Certainly, what sport would you like this for?
+
+User: basketball please.
+
+Assistant: Searching for answers.
+'''
+</code></pre></div></div>
+
+<p>The following figures are from the <a href="https://github.com/harrywang/chatbot-kickstarter/blob/main/slides/slides.pdf">slides</a> shared by the original author of the app.</p>
+
+<p>How to use triage prompts and chat agents to build apps for various business scenarios:
+<img class="mx-auto" src="https://github.com/harrywang/chatbot-kickstarter/assets/595772/b1671107-48b0-4d07-a923-59704f41ab72" /></p>
+
+<p>How companies can build their own moats based on the MVP architecture:</p>
+
+<p><img class="mx-auto" src="https://github.com/harrywang/chatbot-kickstarter/assets/595772/adc8dccc-837f-40c6-907d-5cc1d11d240f" /></p>
+
+<p>PS. The featured image for this post is generated using Stable Diffusion, whose full parameters and the model links can be found at <a href="https://takin.ai/asset/649b1491d1038ebe1e22af27">Takin.AI</a>.</p>Harry WangHeadless Wordpress + Next.js + ElasticSearch2023-07-09T00:00:00+00:002023-07-09T00:00:00+00:00https://harrywang.github.io/wordpress<p><img class="mx-auto" src="https://github.com/harrywang/harrywang.github.io/assets/595772/9247e59a-49e6-4c90-a2d9-423670a63405" /></p>
+
+<p>This past May 27th marks the <a href="https://wp20.wordpress.net/">20th Anniversary of Wordpress</a>. I have been using Wordpress for more than 15 years, e.g., I adopted Wordpress for <a href="https://cswimworkshop.org/">CSWIM</a> in 2012 as a conference co-chair and Wordpress has been powering many websites I built.</p>
+
+<p>Recently, we needed to integrate a CMS with our main site at <a href="https://takin.ai/">Takin.AI</a> and chose to use a Headless Wordpress after looking into many other options, such as <a href="https://strapi.io/">Strapi</a>, <a href="https://www.sanity.io/">Sanity</a>, etc. The main reason to choose Wordpress is because I know Wordpress very well and we have a Wordpress hosting plan on <a href="https://www.siteground.com/">SiteGround</a> for years.</p>
+
+<h2 id="basic-setup">Basic Setup</h2>
+
+<p>We are quite happy with the integration shown at <a href="https://takin.ai/learn">Takin.AI Learning Center</a> and the key steps for this implementation is as follows:</p>
+
+<ul>
+  <li>Get a vanilla Wordpress working on SiteGround</li>
+  <li>Install <a href="https://www.wpgraphql.com/">WP GraphQL</a> plugin to serve the contents via API</li>
+  <li>Install <a href="https://wordpress.org/plugins/wp-githuber-md/">WP Githuber MD</a> plugin to author contents using Markdown</li>
+  <li>Develop the frontend using Next.js and host it on <a href="https://vercel.com/">Vercel</a></li>
+  <li>Redirect the WP frontend using a <a href="https://github.com/harrywang/redirect-headless-wp">custom theme</a> I developed and keep <code class="language-plaintext highlighter-rouge">/wp-admin</code> only for content authoring</li>
+  <li>Optimize the performance by installing <a href="https://wordpress.org/plugins/wpgraphql-smart-cache/">WP GraphQL Smart Cache</a> and other methods</li>
+</ul>
+
+<h2 id="elasticsearch-via-elasticpress-plugin">ElasticSearch via ElasticPress Plugin</h2>
+
+<p>Follow the steps below to add search using ElasticPress Plugin and ElasticSearch (ES)</p>
+
+<ul>
+  <li>Change the default ES username and password:</li>
+</ul>
+
+<p><img width="487" src="https://github.com/harrywang/harrywang.github.io/assets/595772/f1bc63b3-63f8-4429-91f7-bcd73410091d" /></p>
+
+<ul>
+  <li>add the username/pwd by adding one line <code class="language-plaintext highlighter-rouge">define( 'ES_SHIELD', '&lt;username&gt;:&lt;password&gt;' );</code> to the <code class="language-plaintext highlighter-rouge">wp-config.php</code> file using SiteGround UI:</li>
+</ul>
+
+<p><img width="898" src="https://github.com/harrywang/harrywang.github.io/assets/595772/e32d2ab1-5115-4250-98a5-2184e819705e" /></p>
+
+<ul>
+  <li>Check the connection - the warnings can be ignored:</li>
+</ul>
+
+<p><img width="1908" src="https://github.com/harrywang/harrywang.github.io/assets/595772/d3019f1f-062c-4155-88dd-20bb1315f2c2" /></p>
+
+<ul>
+  <li>Sync the posts information to the ES server:</li>
+</ul>
+
+<p><img width="1482" src="https://github.com/harrywang/harrywang.github.io/assets/595772/94b55de9-da8e-4895-a96b-4622a11e0ded" /></p>
+
+<ul>
+  <li>Check the index created in ES:</li>
+</ul>
+
+<p><img width="819" src="https://github.com/harrywang/harrywang.github.io/assets/595772/0275ab96-9f6b-4adb-aa5c-02593b039f2b" /></p>
+
+<ul>
+  <li>Check the contents in ES:</li>
+</ul>
+
+<p><img width="2153" src="https://github.com/harrywang/harrywang.github.io/assets/595772/a118de27-8c51-4a07-b0d5-dc75e01339ea" /></p>
+
+<h2 id="references">References</h2>
+
+<ul>
+  <li><a href="https://github.com/vercel/next.js/tree/canary/examples/cms-wordpress">Vercel Headless Wordpress Docs and Template</a></li>
+  <li><a href="https://vercel.com/guides/wordpress-with-vercel">Using Headless WordPress with Next.js and Vercel</a></li>
+  <li><a href="https://stackoverflow.com/questions/73687998/how-to-get-related-post-by-category-in-headless-wordpressgraphql">How to get related post by category in headless wordpress?(GraphQL)</a></li>
+  <li><a href="https://github.com/10up/ElasticPress/issues/3141">Use ElasticPress</a></li>
+</ul>
+
+<p>PS. The featured image for this post is generated using Stable Diffusion, whose full parameters with model link can be found at <a href="https://takin.ai/asset/647b4d91414f1bb93778ab94">Takin.AI</a>.</p>Harry WangMy Budget PC Build2023-06-17T00:00:00+00:002023-06-17T00:00:00+00:00https://harrywang.github.io/pc<p><img class="mx-auto" src="https://github.com/harrywang/harrywang.github.io/assets/595772/c3fbe3d1-6563-44ef-b06c-6ba9f0f0c275" /></p>
+
+<p>I replaced my old 2080ti GPU with a 4090 in my remote server and built a PC so that I can still use the 2080ti locally. I followed <a href="https://www.youtube.com/watch?v=vUu7N8tq4RE">this great YouTube video</a> and the process was quite easy.</p>
+
+<p>I bought all parts from Amazon and the total is $583:</p>
+<ul>
+  <li>Motherboard: <a href="https://www.amazon.com/gp/product/B089CZSQB4/">MSI B550-A PRO ProSeries Motherboard</a> - $140</li>
+  <li>CPU: <a href="https://www.amazon.com/gp/product/B09VCHR1VH/">AMD Ryzen™ 5 5600 with Cooler</a> - $129</li>
+  <li>RAM (16G): <a href="https://www.amazon.com/gp/product/B07T637L7T/">T-Force Vulcan Z DDR4 16GB Kit</a> - $34</li>
+  <li>SSD (2T): <a href="https://www.amazon.com/gp/product/B0BDTC589G/">Kingston NV2 2TB M.2 2280 NVMe Internal SSD</a> - $85</li>
+  <li>Power Supply Unit (PSU): <a href="https://www.amazon.com/gp/product/B0BWJMDR6N/">750W Fully Modular RGB Power Supply</a> - $80</li>
+  <li>Case: <a href="https://www.amazon.com/gp/product/B0B6YHDB2Y">NZXT H5 Flow Compact ATX Mid-Tower PC Gaming Case - White</a> - $95</li>
+  <li>USB Wifi: <a href="https://www.amazon.com/gp/product/B07P6N2TZH">TP-Link AC1300 USB WiFi Adapter</a> - $20</li>
+</ul>
+
+<p>I then made a bootable USB from ISO image using <a href="https://rufus.ie/en/">Rufus</a> and installed Windows 11. The PC is very quiet and nice-looking :).</p>
+
+<p><img class="mx-auto" src="https://github.com/harrywang/harrywang.github.io/assets/595772/c113ba49-e5a4-4d0a-abbe-d40ff6bdce9d" /></p>
+
+<p>PS. The featured image for this post is generated using Stable Diffusion, whose full parameters with model link can be found at <a href="https://takin.ai/asset/64301d2e38888d0da5220944">Takin.AI</a>.</p>Harry WangPublish NPM and PyPI Packages2023-04-20T00:00:00+00:002023-04-20T00:00:00+00:00https://harrywang.github.io/packages<p><img class="mx-auto" src="https://github.com/harrywang/harrywang.github.io/assets/595772/1259835b-ab54-4e9d-9957-95ec07a4e6f7" /></p>
+
+<p>This post is also for myself - I often want to register packages to <a href="https://www.npmjs.com/">https://www.npmjs.com/</a> and/or <a href="https://pypi.org/">https://pypi.org/</a> and keep on looking for instructions that I forget. Please refer to the two great tutorials in the references section for details. I only list the key steps and notes that I often need to refer to below.</p>
+
+<h2 id="setup-github-repo-for-the-package">Setup Github Repo for the Package</h2>
+
+<p>The easiest way to start is to find an example repo and revise the package information:</p>
+
+<ul>
+  <li><a href="https://github.com/harrywang/greeter-node">https://github.com/harrywang/greeter-node</a> (NPM): package info in <code class="language-plaintext highlighter-rouge">package.json</code></li>
+  <li><a href="https://github.com/harrywang/greeter-python">https://github.com/harrywang/greeter-python</a> (PyPI): package info is in <code class="language-plaintext highlighter-rouge">setup.py</code>. You also need to change package folder name to be consistent.</li>
+</ul>
+
+<h2 id="package-and-publish">Package and Publish</h2>
+
+<p>You need to register accounts on <a href="https://www.npmjs.com/">https://www.npmjs.com/</a> and <a href="https://pypi.org/">https://pypi.org/</a>.</p>
+
+<p>For NPM:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm install
+npm login
+npm publish
+</code></pre></div></div>
+
+<p>Then, you should see your published package, e.g., <a href="https://www.npmjs.com/package/harry-greeter">https://www.npmjs.com/package/harry-greeter</a></p>
+
+<p>For PyPI:</p>
+
+<p>Find classifier (such as supported licenses) from <a href="https://pypi.org/classifiers/">https://pypi.org/classifiers/</a> for <code class="language-plaintext highlighter-rouge">setup.py</code>, then:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python setup.py sdist
+twine upload dist/*
+</code></pre></div></div>
+
+<p>Then, you should see your published package, e.g., <a href="https://pypi.org/project/harrywang-greeter/">https://pypi.org/project/harrywang-greeter/</a></p>
+
+<h2 id="references">References</h2>
+
+<ul>
+  <li><a href="https://itnext.io/step-by-step-building-and-publishing-an-npm-typescript-package-44fe7164964c">Step by step: Building and publishing an NPM Typescript package</a></li>
+  <li><a href="https://realpython.com/pypi-publish-python-package/">How to Publish an Open-Source Python Package to PyPI</a></li>
+</ul>
+
+<p>PS. The featured image for this post is generated using Stable Diffusion, whose full parameters with model link can be found at <a href="https://takin.ai/asset/64d26bdf73e6a163fb1f68e6">Takin.AI</a>.</p>Harry WangSetup Websites using SiteGround2023-03-10T00:00:00+00:002023-03-10T00:00:00+00:00https://harrywang.github.io/siteground<p><img class="mx-auto" src="https://github.com/harrywang/harrywang.github.io/assets/595772/2bbc6a6e-e817-466e-8bab-7b034a8da364" /></p>
+
+<p>This post is mainly for myself - I write down the operations I often need to setup websites here to save time: I setup only a few websites a year and often forget what I did when trying to setup a new one.</p>
+
+<h2 id="setup-domain-name-and-email">Setup Domain Name and Email</h2>
+
+<ul>
+  <li>
+    <p>Register domain on GoDaddy</p>
+  </li>
+  <li>
+    <p>Create a website in SiteGround:</p>
+  </li>
+</ul>
+
+<p><img width="1563" src="https://github.com/harrywang/harrywang.github.io/assets/595772/69be6771-202c-4b91-942d-e15ddef22978" /></p>
+
+<ul>
+  <li>Create empty site and finish:</li>
+</ul>
+
+<p><img width="1512" src="https://github.com/harrywang/harrywang.github.io/assets/595772/a0396b92-3b91-4bef-a4e2-7187cd864765" /></p>
+
+<ul>
+  <li>Change the name servers in GoDaddy to use SiteGround for DNS:</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ns1.siteground.net
+
+ns2.siteground.net
+</code></pre></div></div>
+
+<ul>
+  <li>Go to site tools of SiteGround to setup emails:</li>
+</ul>
+
+<p><img width="283" src="https://github.com/harrywang/harrywang.github.io/assets/595772/86ce1639-450d-4a07-a02c-11c6c0544963" /></p>
+
+<h2 id="setup-a-new-wordpress-website">Setup a new Wordpress Website</h2>
+
+<ul>
+  <li>Create a new Wordpress installation</li>
+  <li>Install a professional theme, such as https://themeforest.net/item/salient-responsive-multipurpose-theme/4363266</li>
+  <li>Find a demo site and load the content</li>
+  <li>Customize the content</li>
+</ul>
+
+<h2 id="clonemigrate-a-wordpress-website">Clone/Migrate a Wordpress Website</h2>
+
+<p>The current Wordpress website is at <code class="language-plaintext highlighter-rouge">2022.yourwebsite.com</code>, which you want to clone to <code class="language-plaintext highlighter-rouge">2023.yourwebsite.com</code>.</p>
+
+<ul>
+  <li>Go to SiteGround and create the subdomain name <code class="language-plaintext highlighter-rouge">2023.yourwebsite.com</code>:</li>
+</ul>
+
+<p><img width="289" src="https://github.com/harrywang/harrywang.github.io/assets/595772/3dba7120-e42d-47ea-9c37-37e8fbc0abe4" /></p>
+
+<ul>
+  <li>Go to 2022 Wordpress Admin site and install SG Migrator plugin:</li>
+</ul>
+
+<p><img width="654" src="https://github.com/harrywang/harrywang.github.io/assets/595772/e3d0c10b-4155-4fdf-96a7-a4685fa3dec2" /></p>
+
+<ul>
+  <li>Go to 2023 SiteGround site and generate a migration token (Site Tools -&gt; WordPress &gt; Migrator):</li>
+</ul>
+
+<p><img width="2134" src="https://github.com/harrywang/harrywang.github.io/assets/595772/ea5db6aa-534b-4414-b9a9-90654d7b6009" /></p>
+
+<ul>
+  <li>Go back to 2022 Wordpress Admin site &gt; open SG Migrator &gt; paste the Token and start a clone/migration:</li>
+</ul>
+
+<p><img width="1326" src="https://github.com/harrywang/harrywang.github.io/assets/595772/f6e7aafd-1241-4ba7-af23-3cc9f1a2e10a" /></p>
+
+<ul>
+  <li>(Optional) Go to 2023 SiteGround site and flush the new 2023 Dynamic Cache: Site Tools &gt; Speed &gt; Caching &gt; Dynamic Cache</li>
+</ul>
+
+<p><img width="1840" src="https://github.com/harrywang/harrywang.github.io/assets/595772/29f647a5-6f8e-4b3a-aa7d-efc08d92cbc1" /></p>
+
+<p>PS. The featured image for this post is generated using Stable Diffusion, whose full parameters with model link can be found at <a href="https://takin.ai/asset/649b149dd1038ebe1e22af2b">Takin.AI</a>.</p>Harry WangWhat I Learned About Fine-tuning Stable Diffusion2023-02-18T00:00:00+00:002023-02-18T00:00:00+00:00https://harrywang.github.io/finetune-sd<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/219880541-ce36d12a-bc7a-476c-b831-09a8d130f61a.png" /></p>
+
+<ul>
+  <li>Updated on 3/6/2023: added How to fine-tune using WebUI section using <a href="https://github.com/d8ahazard/sd_dreambooth_extension">d8ahazard/sd_dreambooth_extension</a></li>
+  <li>Updated on 2/27/2023: added Convert Diffusers LoRA Weights for Automatic1111 WebUI section</li>
+</ul>
+
+<p><a href="https://arxiv.org/abs/2106.09685">LoRA (Low-Rank Adaptation) of Large Language Models</a> was included in the <a href="https://huggingface.co/docs/diffusers/index">Diffusers</a> release a few weeks ago, which enables fine-tuning Stable Diffusion (SD) model with much lower GPU requirements so that I can finally try it on my old RTX 2080 Ti (I now use Tesla V100 most of the time). In addition, LoRA fine-tuning is much faster and the trained weights are much smaller, e.g., ~3M vs. ~5G (Lora models found on <a href="civitai.com">civitai.com</a> are often ~100M-200M, which used a larger rank value such as 128, the default is 4 as explained <a href="https://github.com/haofanwang/Lora-for-Diffusers">here</a>).</p>
+
+<p>There are many tutorials on fine-tuning Stable Diffusion using Colab [<a href="https://www.reddit.com/r/StableDiffusion/comments/110up3f/i_made_a_lora_training_guide_its_a_colab_version/">1</a>] and UI tools [<a href="https://www.youtube.com/watch?v=70H03cv57-o">2</a>][<a href="https://www.youtube.com/watch?v=7m522D01mh0">3</a>][<a href="https://www.shruggingface.com/blog/self-portraits-with-stable-diffusion-and-lora">4</a>]. But I did not find a good “self-contained” repo with environment setup, simple sample datasets, training scripts, and instructions so that people can just clone, customize, and run.</p>
+
+<p>In this tutorial, I want to share my experience in fine-tuning Stable Diffusion using HuggingFace training scripts with a few sample datasets. I am still learning about the tips and tricks on this and will report more findings as I go along.</p>
+
+<p>The data and code can be accessed at this <a href="https://github.com/harrywang/finetune-sd">repo</a> and this tutorial is based on <a href="#references">these references</a>.</p>
+
+<p>Some of my lessons learned are:</p>
+
+<ul>
+  <li>SD fine-tuning evaluation is quite subjective, which has the following implications:
+    <ol>
+      <li>Intermediate checkpoints may have better results - this is different from traditional fine-tuning where we have objective metrics such as precision, recall, f-score, etc. to evaluate the results and could use various rules to stop training to avoid overfitting.</li>
+      <li>Given 1 above, using a system like <a href="https://wandb.ai/site">W&amp;B</a> to track the intermediate experiment results is quite convenient for model selection.</li>
+    </ol>
+  </li>
+  <li>Making good training datasets may be more important than training hyperparameter tuning.</li>
+  <li>Given the same dataset and base model, hyperparameter tuning is the key to fine-tuning quality, which is still largely an art (tricks and tips) than science.</li>
+  <li>Merging existing models and/or with your own custom ones may lead to the desired results.</li>
+  <li>Base model matters - same prompt and hyperparameters may render very different results using different base models - see a comparison page <a href="https://daniel.von-appen.org/stable-diffusion-model-comparison/">here</a></li>
+</ul>
+
+<p>The key topics are:</p>
+
+<ul>
+  <li>how to prepare datasets</li>
+  <li>how to run the training and generation scripts</li>
+  <li>how to convert Diffusers trained weights for use in Automatic1111 WebUI</li>
+  <li>how to fine-tune using WebUI</li>
+  <li>how to merge models and test results</li>
+</ul>
+
+<h2 id="prepare-custom-datasets">Prepare Custom Datasets</h2>
+
+<p>Stable Diffusion can be fine-tuned in different ways, such as:</p>
+
+<ul>
+  <li><a href="https://huggingface.co/docs/diffusers/main/en/training/text2image">Text2Image fine-tuning</a> needs a custom dataset with image and caption pairs, which you can find an example with 15 images of my cat Miles in 
+<a href="https://github.com/harrywang/finetune-sd/tree/main/data/full-finetune/cat">this folder</a>. I manually added the captions in <code class="language-plaintext highlighter-rouge">metadata.jsonl</code> file but you can use models like <a href="https://huggingface.co/spaces/Salesforce/BLIP">BLIP</a> to generate captions using code or <a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Textual-Inversion#preprocess">Automatic1111 SD WebUI</a>.</li>
+  <li><a href="https://huggingface.co/docs/diffusers/main/en/training/dreambooth">DreamBooth fine-tuning</a> needs just a few (typically 5 to 15) images of a subject or style with no captions, which you can find 4 sample datasets in <a href="https://github.com/harrywang/finetune-sd/tree/main/data/dreambooth">this folder</a>:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">dog</code>: the five dog images used in the original DreamBooth paper</li>
+      <li><code class="language-plaintext highlighter-rouge">glasses</code>: I found some sunglasses images on the Internet trying to reproduce the sunglasses examples from the DreamBooth paper</li>
+      <li><code class="language-plaintext highlighter-rouge">cat</code>: my cat Miles</li>
+      <li><code class="language-plaintext highlighter-rouge">missdong</code>: I use <a href="https://www.unrealengine.com/en-US/metahuman">MetaHuman</a> to generate images for a virtual lady, which I named Miss Dong after a Chinese song I like with the same name 董小姐 (<a href="https://open.spotify.com/track/2M6vMxGBuWv3IeRhNsEYIm">listen on Spotify</a>)</li>
+    </ul>
+  </li>
+</ul>
+
+<p>One thing to know when preparing the dataset is how the images are preprocessed before being fed to the model for fine-tuning (<a href="https://harrywang.me/clip#image-feature-extraction-and-downstream-tasks">see my sample code and examples</a>):</p>
+
+<ul>
+  <li><strong>resized</strong>: the shortest side is resized to 512 by default</li>
+  <li><strong>cropped</strong>: 512x512 is randomly cropped by default - we will use center-cropping instead</li>
+  <li><strong>padded</strong>: if the image is smaller than 512x512, paddings are added</li>
+</ul>
+
+<p>The following shows the results of my default resizing and cropping (left column) and my custom resizing and cropping (right column) - note the custom cropped images focus more on the subject, which is better for fine-tuning:</p>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/215897720-a34098ec-ff45-46f6-9dd0-84a48eefa6bc.jpg" /></p>
+
+<p>In addition, the images should have variations about the subject, such as:</p>
+
+<ul>
+  <li>facial expression</li>
+  <li>camera angles</li>
+  <li>pose</li>
+  <li>background</li>
+  <li>properties (clothing, haircut - not for Miles ^_^)</li>
+</ul>
+
+<p><a href="https://www.birme.net/">birme.net</a> is a great website for bulk image resizing, renaming, format changing.</p>
+
+<h2 id="run-training-and-use-the-fine-tuned-models">Run Training and Use the Fine-tuned Models</h2>
+
+<p>To try the examples, you can simply clone the repo and set up the environment as follows (Note that the Python version matters - the code was tested with Python 3.9.11. 3.10.x and 3.8.x may have issues like [<a href="https://github.com/d8ahazard/sd_dreambooth_extension/issues/40">1</a>])</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/harrywang/finetune-sd.git
+cd finetune-sd
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+accelerate config default
+</code></pre></div></div>
+
+<p>Then, you need to log in to HuggingFace with your token and WandB (optional) with your API key:</p>
+
+<p>NOTE: on Ubuntu, if you run into <code class="language-plaintext highlighter-rouge">huggingface-cli login</code> command not found error, you may need to add the path of <code class="language-plaintext highlighter-rouge">huggingface_hub</code> package to <code class="language-plaintext highlighter-rouge">$PATH</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip show huggingface_hub | grep Location
+/home/hjwang/.local/lib/python3.8/site-packages
+</code></pre></div></div>
+<p>Then, edit <code class="language-plaintext highlighter-rouge">vim ~/.profile</code> for bash shell and add the following to <code class="language-plaintext highlighter-rouge">$PATH</code>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>if [ -d "/home/hjwang/.local/lib/python3.8/site-packages" ] ; then
+    PATH="/home/hjwang/.local/lib/python3.8/site-packages:$PATH"
+fi
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">source ~/.profile</code> then restart the terminal to proceed.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>huggingface-cli login
+wandb login
+</code></pre></div></div>
+<p>Then, you can run the training scripts using my cat dataset as follows - NOTE: you should change the argument values to fit your need, such as learning rate, training steps, checkpoint steps, validation prompt, etc.</p>
+
+<ul>
+  <li>
+    <p>Conduct a Text2Image fine-tuning using LoRA:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export MODEL_NAME="runwayml/stable-diffusion-v1-5"
+export DATA_DIR="./data/full-finetune/cat"
+export OUTPUT_DIR="./models/lora/miles"
+
+accelerate launch --mixed_precision="fp16"  train_text_to_image_lora.py \
+  --pretrained_model_name_or_path=$MODEL_NAME \
+  --train_data_dir=$DATA_DIR \
+  --dataloader_num_workers=8 \
+  --resolution=512 --center_crop --random_flip \
+  --train_batch_size=1 \
+  --gradient_accumulation_steps=4 \
+  --max_train_steps=1500 \
+  --learning_rate=1e-04 \
+  --max_grad_norm=1 \
+  --lr_scheduler="cosine" --lr_warmup_steps=0 \
+  --output_dir=${OUTPUT_DIR} \
+  --checkpointing_steps=500 \
+  --validation_prompt="A photo of a cat in a bucket" \
+  --validation_epochs=10 \
+  --seed=42 \
+  --report_to=wandb
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Conduct a DreamBooth fine-tuning using LoRA (<code class="language-plaintext highlighter-rouge">sks</code> below is the special token - see more discussion about this <a href="https://www.reddit.com/r/DreamBooth/comments/zc5w3e/rare_tokens_for_dreambooth_training/">here</a>):</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export MODEL_NAME="runwayml/stable-diffusion-v1-5"
+export INSTANCE_DIR="./data/dreambooth/cat"
+export OUTPUT_DIR="./models/dreambooth-lora/miles"
+
+accelerate launch train_dreambooth_lora.py \
+  --pretrained_model_name_or_path=$MODEL_NAME  \
+  --instance_data_dir=$INSTANCE_DIR \
+  --output_dir=$OUTPUT_DIR \
+  --instance_prompt="a photo of sks cat" \
+  --resolution=512 --center_crop \
+  --train_batch_size=1 \
+  --gradient_accumulation_steps=4 \
+  --checkpointing_steps=100 \
+  --learning_rate=1e-4 \
+  --lr_scheduler="constant" \
+  --lr_warmup_steps=0 \
+  --max_train_steps=1500 \
+  --validation_prompt="A photo of a sks cat in a bucket" \
+  --validation_epochs=10 \
+  --seed=42 \
+  --report_to="wandb"
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Conduct a DreamBooth fine-tuning using LoRA with class prompt (class images generated by the model) and prior preservation (with weight 0.5):</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export MODEL_NAME="runwayml/stable-diffusion-v1-5"
+export INSTANCE_DIR="./data/dreambooth/cat"
+export CLASS_DIR="./data/dreambooth/cat-class"
+export OUTPUT_DIR="./models/dreambooth-lora/miles"
+
+accelerate launch train_dreambooth_lora.py \
+  --pretrained_model_name_or_path=$MODEL_NAME  \
+  --instance_data_dir=$INSTANCE_DIR \
+  --class_data_dir=$CLASS_DIR \
+  --output_dir=$OUTPUT_DIR \
+  --instance_prompt="a photo of sks cat" \
+  --class_prompt="a photo of a cat" \
+  --with_prior_preservation --prior_loss_weight=0.5 \
+  --resolution=512 \
+  --train_batch_size=2 \
+  --gradient_accumulation_steps=1 \
+  --checkpointing_steps=100 \
+  --learning_rate=1e-4 \
+  --report_to="wandb" \
+  --lr_scheduler="constant" \
+  --lr_warmup_steps=0 \
+  --max_train_steps=1500 \
+  --validation_prompt="A photo of sks cat in a bucket" \
+  --num_class_images=200 \
+  --validation_epochs=10 \
+  --seed=42
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<p>If you use W&amp;B, the validation results (4 generated images from the prompt “A photo of a sks cat in a bucket”) are automatically tracked:</p>
+
+<ul>
+  <li>
+    <p>at training step 4, the cats are nothing like my cat Miles (underfitting):</p>
+
+    <p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/219907652-26dc9bb4-92c2-4b5e-ab0e-8e7b810b8259.png" /></p>
+  </li>
+  <li>
+    <p>at training step 684, some cats look really like Miles, especially the second and third ones:</p>
+
+    <p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/219907654-d041786f-bde9-4f9b-b13a-0ca4ded90413.png" /></p>
+  </li>
+  <li>
+    <p>at training step 1084, all cats have weird eyes:</p>
+
+    <p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/219907656-59bd527d-5556-4168-813d-f96c17728152.png" /></p>
+  </li>
+</ul>
+
+<p>In this case, choosing a checkpoint close to step 684 may generate better results.</p>
+
+<p>Once the training is finished, the fine-tuned LoRA weights are stored in the output folder, which is <code class="language-plaintext highlighter-rouge">./models/dreambooth-lora/miles</code> for my cat example above. The folder includes the final weights and intermediate checkpoint weights.</p>
+
+<p>Use <code class="language-plaintext highlighter-rouge">generate-lora.py</code> to generate images using the fine-tuned LoRA weights:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python generate-lora.py --prompt "a sks cat standing on the great wall" --model_path "./models/dreambooth-lora/miles" --output_folder "./outputs" --steps 50
+</code></pre></div></div>
+
+<p>You can find other examples to run LoRA fine-tuning using other datasets <a href="https://github.com/harrywang/finetune-sd">here</a> and examples to run DreamBooth without LoRA as well.</p>
+
+<p>I also have not experimented with different settings on learning rates, prior preservation, schedulers, and text encoder found <a href="https://huggingface.co/blog/dreambooth">here</a>, which seem to be quite effective on face fine-tuning.</p>
+
+<h2 id="convert-diffusers-lora-weights-for-automatic1111-webui">Convert Diffusers LoRA Weights for Automatic1111 WebUI</h2>
+
+<p>If you download Lora models from <a href="civitai.com">civitai.com</a>, you can follow this <a href="https://www.kombitz.com/2023/02/09/how-to-use-lora-models-with-automatic1111s-stable-diffusion-web-ui/">tutorial</a> to use the LoRA models with Automatic1111 SD WebUI.</p>
+
+<p>However, the LoRA weights trained using Diffusers are saved in <code class="language-plaintext highlighter-rouge">.bin</code> or <code class="language-plaintext highlighter-rouge">.pkl</code> format, which must be converted first in order to be used in Automatic1111 WebUI (see <a href="https://github.com/huggingface/diffusers/issues/2326">here</a> for detailed discussions).</p>
+
+<p>As seen below, the trained LoRA weights are stored in <code class="language-plaintext highlighter-rouge">custom_checkpoint_0.pkl</code> or <code class="language-plaintext highlighter-rouge">pytorch_model.bin</code>:</p>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/221718501-dc79a799-5fe5-4b9f-9b44-c19ac4103c06.png" /></p>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/221718531-10fe4999-0ee0-4e6f-abf4-d9fc069ec540.png" /></p>
+
+<p><a href="https://github.com/harrywang/finetune-sd/blob/main/convert-to-safetensors.py"><code class="language-plaintext highlighter-rouge">convert-to-safetensors.py</code></a> can be used to convert <code class="language-plaintext highlighter-rouge">.bin</code> or <code class="language-plaintext highlighter-rouge">.pkl</code> files into <code class="language-plaintext highlighter-rouge">.safetensors</code> format, which can be used in WebUI (just put the converted the file in WebUI <code class="language-plaintext highlighter-rouge">models/Lora</code>). The script is adapted from the one written by <a href="https://github.com/ignacfetser">ignacfetser</a>.</p>
+
+<p>Simply put this script in the same folder of the <code class="language-plaintext highlighter-rouge">.bin</code> or <code class="language-plaintext highlighter-rouge">.pkl</code> file and run <code class="language-plaintext highlighter-rouge">python convert-to-safetensors.py --file checkpoint_file</code></p>
+
+<p>PS: if you want to convert Lora models from <a href="civitai.com">civitai.com</a> to diffusers format so that you can use them using code, please check out this <a href="Lora models from [civitai.com](civitai.com)">PR</a>.</p>
+
+<h2 id="fine-tune-using-webui">Fine-tune using WebUI</h2>
+
+<p>You need to install Automatic1111 WebUI and two extensions <a href="https://github.com/d8ahazard/sd_dreambooth_extension">d8ahazard/sd_dreambooth_extension</a> and <a href="https://github.com/kohya-ss/sd-webui-additional-networks">kohya-ss/sd-webui-additional-networks</a> - check out <a href="https://harrywang.me/diffusion">my installation instructions</a> and then follow the <a href="https://www.youtube.com/watch?v=Bdl-jWR3Ukc">Youtube tutorial</a> to train.</p>
+
+<p>I run into many issues and finally trained a model successfully using 12G 2080Ti:</p>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/223163890-668143e5-2bed-48b0-9208-64a73d4f8e36.png" /></p>
+
+<p>I record the issues and solutions below in case you need them:</p>
+
+<ul>
+  <li>
+    <p>when you use Performance Wizard, some training parameters might be wrong, which can cause issues, such as <a href="https://github.com/d8ahazard/sd_dreambooth_extension/issues/996">Step Ratio of Text Encoder Training value empty</a>, batch size set to non-integer, etc.</p>
+  </li>
+  <li>
+    <p><a href="https://github.com/d8ahazard/sd_dreambooth_extension/issues/802">Fresh new model with Lora model list empty</a> - make sure to reload setting after changing the json file.</p>
+  </li>
+  <li>
+    <p>Dataset and class image folders must be separate (don’t put reg images inside training images - recursive reg image generation)</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/home/hjwang/finetune-sd/data/dreambooth/david-beckham
+/home/hjwang/finetune-sd/data/dreambooth/david-beckham-reg
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Uncheck Cache Latents to save GPU - I need to uncheck this to avoid CUDA out of memory error on 2080Ti</p>
+  </li>
+  <li>
+    <p>Lora Weights not compatible with <a href="https://github.com/kohya-ss/sd-webui-additional-networks">kohya-ss/sd-webui-additional-networks</a> - solved by <a href="https://github.com/d8ahazard/sd_dreambooth_extension/issues/1020">pulling from the <code class="language-plaintext highlighter-rouge">dev</code> branch</a> (3/6/2023)</p>
+  </li>
+  <li>
+    <p>no need to use special tokens such as sks, ohwx, just use a common word, e.g., david-beckham, 3d-avatar</p>
+  </li>
+</ul>
+
+<h2 id="merge-models">Merge Models</h2>
+
+<p>Another way to get a custom model is via merging existing models, which can be easily done using Automatic1111 WebUI by following the tutorial <a href="https://www.youtube.com/watch?v=xLQcWKI5OLk">here</a>.</p>
+
+<p>I use an example to show why and how to merge models. You can find tons of models and model merging receipts from <a href="https://civitai.com/">civitai.com</a>.</p>
+
+<p>The following XY Plot shows the generated images using the prompt “cat” and seed values from 1 to 5 from three models (top to bottom):</p>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/219909592-4c5a15b4-34ae-4f22-b2c7-6de5c1f6de51.png" /></p>
+
+<ul>
+  <li>the <a href="https://huggingface.co/runwayml/stable-diffusion-v1-5/tree/main">SD 1.5 base model</a>: the cats are realistic, i.e., like real cats</li>
+  <li>the <a href="https://civitai.com/models/4384/dreamshaper">Dream Shaper model</a>: the cats are very “dreamy”, i.e., cartoon-looking with a more artistic touch.</li>
+  <li>my merged model of the two models above with multiplier setting 0.3, which means I want to have 30% of the DreamShaper model effect merged into the SD 1.5 base model. The results clearly show the balanced effect - realistic with a more dreamy feeling (merging the two models only takes less than 2 minutes on Tesla V100).</li>
+</ul>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/219909605-15a05e93-03f7-4c0b-99c3-fa4e5cb85820.png" /></p>
+
+<p>By repeating the model merging steps, you can generate models with targeted effects, and many popular models are merged models, such as <a href="https://civitai.com/models/4384/dreamshaper">DreamShaper</a> mentioned above, <a href="https://civitai.com/models/3666/protogen-x34-photorealism-official-release">Photogen</a>, <a href="https://civitai.com/models/5414/pastel-mix-stylized-anime-model">PastelMix</a> and many NSFW models.</p>
+
+<h2 id="references">References</h2>
+
+<ul>
+  <li><a href="https://huggingface.co/blog/lora">https://huggingface.co/blog/lora</a></li>
+  <li><a href="https://huggingface.co/blog/dreambooth">https://huggingface.co/blog/dreambooth</a></li>
+  <li><a href="https://tryolabs.com/blog/2022/10/25/the-guide-to-fine-tuning-stable-diffusion-with-your-own-images">https://tryolabs.com/blog/2022/10/25/the-guide-to-fine-tuning-stable-diffusion-with-your-own-images</a></li>
+  <li>Various posts in the <a href="https://www.reddit.com/r/StableDiffusion/">unofficial Stable Diffusion subreddit</a></li>
+</ul>
+
+<p>PS. The first image for this post is generated via <a href="https://www.midjourney.com/">Midjourney</a> using the prompt “experiment cooking with thousands of different receipts and flasks flying in the universe “.</p>Harry WangZero-shot Image Classification and Semantic Image Search using CLIP and Unsplash Dataset2023-01-15T00:00:00+00:002023-01-15T00:00:00+00:00https://harrywang.github.io/clip<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/212702786-693bb14e-64dc-4d81-a973-eb55164a114f.png" /></p>
+
+<p><a href="https://openai.com/blog/clip/">CLIP (Contrastive Language–Image Pre-training)</a> was released by OpenAI about two years ago (January 2021), which is the foundation and a major component of the “game-changer” text-to-image model <a href="https://stability.ai/blog/stable-diffusion-public-release">Stable Diffusion</a> (released by Stability AI in August 2022).</p>
+
+<p>I developed this tutorial to show the following tasks using CLIP and Unsplash dataset:</p>
+
+<ul>
+  <li>Zero-shot image classification</li>
+  <li>Semantic image search</li>
+  <li>Image feature extraction and downstream tasks (classification and clustering)</li>
+</ul>
+
+<p>The data and code can be accessed at this <a href="https://github.com/harrywang/clip-tasks">repo</a>.</p>
+
+<p>This tutorial is based on <a href="#references">these references</a>.</p>
+
+<h2 id="dataset">Dataset</h2>
+
+<p>The dataset for this tutorial is based on the open dataset from <a href="https://unsplash.com/data">Unsplash</a>. I did the following to make the dataset more accessible:</p>
+
+<ul>
+  <li>Download ~6000 photos from Unsplash - the entire lite dataset has 25,000 images, which are too large for my tutorial purpose (see <a href="https://github.com/harrywang/clip-tasks/blob/main/unsplash-downloader.ipynb">code</a>)</li>
+  <li>Select 1k and 5k images with metadata (see <a href="https://github.com/harrywang/clip-tasks/blob/main/unsplash-1k-5k.ipynb">code</a>)</li>
+  <li>Resize and compressed the images to be ~200 times smaller: 1K 8.45G –&gt; 42M, 5K 43.38G –&gt; 213M (see <a href="https://github.com/harrywang/clip-tasks/blob/main/unsplash-img-compression.ipynb">code</a>)</li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">1k-compressed</code> (~42M) is included in this <a href="https://github.com/harrywang/clip-tasks">repo</a>. <code class="language-plaintext highlighter-rouge">1k</code> (~8.45G) and <code class="language-plaintext highlighter-rouge">5k-compressed</code> (~213M) can be downloaded from <a href="https://www.kaggle.com/datasets/harrywang/unsplash">Kaggle</a>.</p>
+
+<h2 id="zero-shot-image-classification">Zero-shot Image Classification</h2>
+
+<p>Simply put, zero-shot learning means a model can recognize things that it hasn’t explicitly seen before during training.</p>
+
+<p>For example, the Unsplash photos do not have explicit labels/tags to show:</p>
+
+<ul>
+  <li>whether a photo is taken at a different time of the day, such as dawn, day, dusk, and night</li>
+  <li>whether a photo is taken indoors or outdoors</li>
+</ul>
+
+<p>In a typical supervised learning setting, you would label some photos with dawn/day/dusk/night and indoor/outdoor and then train a model to label the rest of your data.</p>
+
+<p>With zero-shot learning, you don’t need manual labeling, which is often costly.</p>
+
+<p>In this <a href="https://github.com/harrywang/clip-tasks/blob/main/clip-img-cls.ipynb">notebook</a>, I show how to use CLIP to do zero-shot image classification to add two additional features to the dataset:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">taken_time</code> with values: <code class="language-plaintext highlighter-rouge">dawn</code>, <code class="language-plaintext highlighter-rouge">day</code>, <code class="language-plaintext highlighter-rouge">dusk</code>, or <code class="language-plaintext highlighter-rouge">night</code></li>
+  <li><code class="language-plaintext highlighter-rouge">taken_space</code> with values: <code class="language-plaintext highlighter-rouge">indoor</code> or <code class="language-plaintext highlighter-rouge">outdoor</code></li>
+</ul>
+
+<p>CLIP makes this task very simple:</p>
+
+<blockquote>
+  <p>given an image and a text prompt, CLIP can return a cosine similarity score.</p>
+</blockquote>
+
+<p>The key steps are:</p>
+
+<ul>
+  <li>
+    <p>Create the text prompts for the labels, e.g., <code class="language-plaintext highlighter-rouge">A photo taken at dawn</code>, <code class="language-plaintext highlighter-rouge">A photo taken at day</code>, <code class="language-plaintext highlighter-rouge">A photo taken at dusk</code>, <code class="language-plaintext highlighter-rouge">A photo taken at night</code>, and tokenize them:</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s">'dawn'</span><span class="p">,</span> <span class="s">'day'</span><span class="p">,</span> <span class="s">'dusk'</span><span class="p">,</span> <span class="s">'night'</span><span class="p">]</span>  <span class="c1"># the target labels
+</span><span class="n">text_prompts</span> <span class="o">=</span> <span class="p">[</span><span class="s">'A photo taken at '</span> <span class="o">+</span> <span class="n">label</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]</span>
+<span class="n">text</span> <span class="o">=</span> <span class="n">clip</span><span class="p">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">text_prompts</span><span class="p">).</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># tokenize the text
+</span></code></pre></div>    </div>
+  </li>
+  <li>
+    <p>load and preprocess each image:</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">image</span> <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span><span class="n">Image</span><span class="p">.</span><span class="nb">open</span><span class="p">(</span><span class="n">im</span><span class="p">)).</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># preprocess image
+</span></code></pre></div>    </div>
+  </li>
+  <li>
+    <p>calculate the cosine similarity scores (logit scores) between the images and the 4 prompts and use the label with the highest score as the prediction:</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">logits_per_image</span><span class="p">,</span> <span class="n">logits_per_text</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>  <span class="c1"># return cosine similarity scores
+</span><span class="n">probs</span> <span class="o">=</span> <span class="n">logits_per_image</span><span class="p">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">).</span><span class="n">cpu</span><span class="p">().</span><span class="n">numpy</span><span class="p">()</span>  <span class="c1"># use softmax to get probabilities
+</span><span class="n">choices</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span>  <span class="c1"># use argmax to get the largest number as the prediction
+</span></code></pre></div>    </div>
+  </li>
+</ul>
+
+<p>For example, the cosine similarity scores for the following photo are <code class="language-plaintext highlighter-rouge">[0.488   0.1882  0.3152  0.00908]</code> and therefore is predicted to be taken at dawn (<code class="language-plaintext highlighter-rouge">0.488</code> is the largest) - this is pretty good given the dew on the grass.</p>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/212780252-4d805954-90af-44d3-999a-c90b4513d945.png" /></p>
+
+<p>The histograms of the classification results are as follows:</p>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/212928082-cc32091d-d6d2-4051-b5d1-5b837c08571d.png" /></p>
+
+<p>I wrote a code snippet to randomly show the prediction results, which you can use to evaluate the correctness of the labels:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># random verify the result
+# sample one for each cls: dusk, day, dawn, night
+
+photos_pred = pd.read_csv('photos-1k-pred.csv')
+samples = photos_pred.groupby('taken_time').sample(1)
+
+ids = list(samples.photo_id)
+labels = list(samples.taken_time)
+total_photos = len(ids)
+sample_photos = [f'./1k-compressed/'+ idx + '.jpg' for idx in ids]
+
+# display the result horizontally 
+fig = figure(figsize=(20, 80))
+
+for i in range(total_photos):
+    ax = fig.add_subplot(1, total_photos, i+1)
+    image = imread(sample_photos[i])
+    imshow(image)
+    ax.set_title(labels[i])
+    axis('off')
+</code></pre></div></div>
+<p>As always, some predictions are very good (<code class="language-plaintext highlighter-rouge">day</code> and <code class="language-plaintext highlighter-rouge">night</code> are quite accurate) and some are just OK (<code class="language-plaintext highlighter-rouge">dawn</code> and <code class="language-plaintext highlighter-rouge">dusk</code> in some cases are even hard for a human to tell).</p>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/212781024-d65113be-f747-49ee-91a8-b98ecf6b5449.png" /></p>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/212781066-97af1c8f-0d1b-4b54-be44-f98e5ee0899b.png" /></p>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/212781272-c9849e2e-fcb6-4d03-811b-3c27cb89426e.png" /></p>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/212781304-9e8bc82b-a317-43ab-ae70-ccf6e91e80e2.png" /></p>
+
+<p>I also wrote another <a href="https://github.com/harrywang/clip-tasks/blob/main/clip-img-cls-hf.ipynb">notebook</a> to show how to do this using <a href="https://huggingface.co/openai/clip-vit-large-patch14">HuggingFace Transformers</a>.</p>
+
+<h2 id="semantic-image-search">Semantic Image Search</h2>
+
+<p>Assuming we don’t have any tags related to the photos, then we cannot use lexical search, i.e., searching for literal matches of the query words/phrases (and/or variants), to retrieve the relevant photos.</p>
+
+<p>Semantic search means to search with meaning, which aims to understand the intent and contextual meaning of the search query. For example, when we search <code class="language-plaintext highlighter-rouge">dog in the snow</code>, we hope the search engine can understand the meaning of the query instead of simply searching for photos with tags, such as <code class="language-plaintext highlighter-rouge">dog</code>, <code class="language-plaintext highlighter-rouge">snow</code>, etc. In addition, the images must also be represented with meaning beyond the typical pixel information.</p>
+
+<p>CLIP is trained using a multimodal learning approach, which enables encoding images and texts as numerical features (tensors/vectors) with contextual meaning, e.g., the text encoder in Stable Diffusion is just CLIP text encoder. The encoded image and text features can then be used in various downstream tasks, such as semantic image search, search with an image, image captioning, etc.</p>
+
+<p>In this <a href="https://github.com/harrywang/clip-tasks/blob/main/clip-img-search.ipynb">notebook</a>, I show how to conduct semantic image search, which includes the following key steps:</p>
+
+<ul>
+  <li>
+    <p>Encode all images (processed in batches and then combined into one large numpy array):</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># Load all the photos from the files
+photos = [Image.open(photo_file) for photo_file in photos_batch]
+
+# Preprocess all photos by stacking the result for each photo
+photos_preprocessed = torch.stack([preprocess(photo) for photo in photos]).to(device)
+
+with torch.no_grad():
+    # Encode the photos batch to compute the feature vectors and normalize them
+    photos_features = model.encode_image(photos_preprocessed)
+    photos_features /= photos_features.norm(dim=-1, keepdim=True)
+...
+
+# Load all numpy files
+features_list = [np.load(features_file) for features_file in sorted(features_path.glob("*.npy"))]
+
+# Concatenate the features and store them in a merged file
+features = np.concatenate(features_list)
+np.save(features_path / "features.npy", features)
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Encode the search query, such as <code class="language-plaintext highlighter-rouge">dog in the snow</code>:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>search_query = "dog in the snow"
+
+with torch.no_grad():
+    # Encode and normalize the description using CLIP
+    text_encoded = model.encode_text(clip.tokenize(search_query).to(device))
+    text_encoded /= text_encoded.norm(dim=-1, keepdim=True)
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Compare the text feature to all image features via matrix product <code class="language-plaintext highlighter-rouge">@</code>/<code class="language-plaintext highlighter-rouge">torch.matmul()</code> and find the best matches (the top N results).</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>similarities = list((text_features @ photo_features.T).squeeze(0))
+
+# Sort the photos by their similarity score
+best_photos = sorted(zip(similarities, range(photo_features.shape[0])), key=lambda x: x[0], reverse=True)
+print(best_photos[:3])
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<p>Let’s look at some results:</p>
+
+<p>Search <code class="language-plaintext highlighter-rouge">dog</code> and the photos are all dogs (remember there are no tags):</p>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/212782881-a2cc5647-5620-4867-a5cc-40aa6cf193ee.png" /></p>
+
+<p>Search <code class="language-plaintext highlighter-rouge">dog in the snow</code> and context <code class="language-plaintext highlighter-rouge">snow</code> is successfully captured:</p>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/212782883-8ef9a904-cc10-4dd6-b965-45f838edbc4b.png" /></p>
+
+<p>Search <code class="language-plaintext highlighter-rouge">music</code> - an abstract word but all music-related photos are returned! - there are only two photos are music-related - I went through all 1000 photos to make sure (browsing beautiful photos is a pleasure ^_^)</p>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/212782880-39e8199b-4a32-4482-8aed-ae2582ca6f23.png" /></p>
+
+<p>Search <code class="language-plaintext highlighter-rouge">listen to music</code> - see how the photo with a band is not shown anymore - amazing.</p>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/212788043-81e3240f-1fd0-4b44-a4a1-24e364e4b9c5.png" /></p>
+
+<p>Feel free to try more search queries and let me know if you find any additional interesting examples.</p>
+
+<h2 id="image-feature-extraction-and-downstream-tasks">Image Feature Extraction and Downstream Tasks</h2>
+
+<p>By default, CLIP resizes the shortest edge of the image to 224 and does a center crop of 224x224 (See <a href="https://github.com/openai/CLIP/blob/3702849800aa56e2223035bccd1c6ef91c704ca8/clip/clip.py#L79-L86">code</a>). It’s useful to understand how to manipulate images using Python.</p>
+
+<p>In this <a href="https://github.com/harrywang/clip-tasks/blob/main/clip-pillow-basics.ipynb">notebook</a>, I show the basic image manipulations using Pillow, which is used in CLIP preprocessing step, such as:</p>
+
+<ul>
+  <li>rotation and mirroring:</li>
+</ul>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/215577882-35a95e42-75ba-4f87-8815-a7f29bd4b90d.png" /></p>
+
+<ul>
+  <li>padding and filling:</li>
+</ul>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/215579122-4a5c504b-a60f-4af1-a1df-fb242d3cdeb2.png" /></p>
+
+<ul>
+  <li>resizing and center-cropping:</li>
+</ul>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/215578574-81b62bfb-aff2-4499-8d4e-5c73d823b92f.png" /></p>
+
+<p>I also demonstrate how to “de-process” and show the preprocessed image by CLIP.</p>
+
+<p>In another <a href="https://github.com/harrywang/clip-tasks/blob/main/clip-img-sklearn.ipynb">notebook</a>, I show how to use CLIP (a multimodal model) and <a href="https://huggingface.co/docs/timm/models/efficientnet">EfficientNet</a> (a CV model) to extract image features and use those features to do traditional classification and clustering (with PCA for dimensionality reduction). The task is to use image features to predict the camera ISO levels used to take the photo, which may not be a good task given that there are so many other related features such as <a href="https://improvephotography.com/photography-basics/aperture-shutter-speed-and-iso/">aperture and shutter speed</a>. A few hundreds of images may also not enough to train a good model - focus on how to do these tasks rather than the performance.</p>
+
+<h2 id="mps-vs-cpu">MPS vs. CPU</h2>
+
+<p>As a side note, I did some tests with CLIP encoding using the 1k original Unsplash photos on my MacBook Pro with M1 (16G 2020 model).</p>
+
+<blockquote>
+  <p><a href="https://developer.apple.com/metal/pytorch/">MPS</a> is slower than CPU in most cases.</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>Batch Size</th>
+      <th>MPS</th>
+      <th>CPU</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>100</td>
+      <td>5m 12.2s</td>
+      <td>4m 51.4s</td>
+    </tr>
+    <tr>
+      <td>500</td>
+      <td>4m 54.5s</td>
+      <td>4m 51.7s</td>
+    </tr>
+    <tr>
+      <td>1000</td>
+      <td>4m 54.1s</td>
+      <td>4m 57.1s</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>See additional related discussions <a href="https://github.com/pytorch/pytorch/issues/77799">here</a>, such as “…. you will only observe the difference when inputs are large enough … This is because loading small data to memory and using GPU for calculation is overkill so the CPU takes advantage but if you have large data, GPU can compute it efficiently and take over the CPU …” by @bikcrum.</p>
+
+<h2 id="references">References</h2>
+
+<ul>
+  <li><a href="https://medium.com/@JettChenT/image-classification-with-openai-clip-3ab5f1c23e35">https://medium.com/@JettChenT/image-classification-with-openai-clip-3ab5f1c23e35</a></li>
+  <li><a href="https://towardsdatascience.com/clip-the-most-influential-ai-model-from-openai-and-how-to-use-it-f8ee408958b1">https://towardsdatascience.com/clip-the-most-influential-ai-model-from-openai-and-how-to-use-it-f8ee408958b1</a></li>
+  <li><a href="https://github.com/haltakov/natural-language-image-search">https://github.com/haltakov/natural-language-image-search</a></li>
+  <li><a href="https://huggingface.co/docs/transformers/model_doc/clip">https://huggingface.co/docs/transformers/model_doc/clip</a></li>
+</ul>
+
+<p>PS. The first image for this post is generated via <a href="https://www.midjourney.com/">Midjourney</a> using the prompt “millions of random words and pictures connected with strings, flying in the mystery universe”.</p>Harry WangMy Ubuntu Command Cheatsheet2022-08-25T00:00:00+00:002022-08-25T00:00:00+00:00https://harrywang.github.io/cmd<p><img class="mx-auto" src="https://replicable-assets-prod.s3.eu-north-1.amazonaws.com/7ad0ac49b1ed1be7aec8bcd83567bbf73e873f0f83d6e02a35d8ae1ec125e192.png" /></p>
+
+<p>This is a simple Ubuntu command cheatsheet for myself.</p>
+
+<h2 id="gpu">GPU</h2>
+
+<ul>
+  <li>Use <a href="https://developer.nvidia.com/nvidia-system-management-interface">NVIDIA System Management Interface</a> (<code class="language-plaintext highlighter-rouge">nvidia-smi</code>):</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ nvidia-smi
+Thu Jun 22 11:28:07 2023       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 525.116.04   Driver Version: 525.116.04   CUDA Version: 12.0     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  NVIDIA GeForce ...  On   | 00000000:67:00.0 Off |                  Off |
+|  0%   48C    P8    29W / 450W |   3997MiB / 24564MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|    0   N/A  N/A     43171      C   python3                          3994MiB |
++-----------------------------------------------------------------------------+
+</code></pre></div></div>
+
+<ul>
+  <li>Check GPU usage using <code class="language-plaintext highlighter-rouge">nvtop</code>: install the package using <code class="language-plaintext highlighter-rouge">sudo apt install nvtop</code> and then run <code class="language-plaintext highlighter-rouge">nvtop</code></li>
+</ul>
+
+<h2 id="file-system">File System</h2>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">ps</code> means process status:</p>
+
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">-u</code>: list all processes by user name:</li>
+      <li><code class="language-plaintext highlighter-rouge">-e</code>: view all the running processes</li>
+      <li>
+        <p><code class="language-plaintext highlighter-rouge">-f</code>: view full-format listing</p>
+
+        <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  ps -u hjwang
+  PID TTY          TIME CMD
+  3558 ?        00:00:02 sshd
+  3559 pts/0    00:00:00 bash
+  ...
+  22112 ?        01:17:52 python
+</code></pre></div>        </div>
+      </li>
+    </ul>
+
+    <p><code class="language-plaintext highlighter-rouge">|</code>: pipe a command that lets you use two or more commands such that output of one command serves as input to the next. <code class="language-plaintext highlighter-rouge">grep</code> is a command-line utility for searching plain-text data sets for lines that match a regular expression.</p>
+
+    <p><code class="language-plaintext highlighter-rouge">ps -ef | grep python</code> can be use to show all running processes with python.</p>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">kill PID</code>: terminate a process using its ID: <code class="language-plaintext highlighter-rouge">kill 22112</code> (gracefully) or <code class="language-plaintext highlighter-rouge">kill -9 22112</code> (forcefully and immediately)</li>
+  <li><code class="language-plaintext highlighter-rouge">du -sh *</code>: list the sizes of all files and sub-folders.</li>
+  <li><code class="language-plaintext highlighter-rouge">tree</code>: print the directory tree in terminal: install using <code class="language-plaintext highlighter-rouge">sudo apt-get install tree</code></li>
+</ul>
+
+<h2 id="os">OS</h2>
+
+<ul>
+  <li>Show OS version: <code class="language-plaintext highlighter-rouge">lsb_release -a</code></li>
+</ul>
+
+<h2 id="python">Python</h2>
+
+<p>Change pip source:</p>
+<ul>
+  <li>https://pypi.tuna.tsinghua.edu.cn/simple</li>
+  <li>https://mirrors.aliyun.com/pypi/simple</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip config set global.index-url https://mirrors.aliyun.com/pypi/simple
+Writing to /home/sedy/.config/pip/pip.conf
+</code></pre></div></div>
+
+<h2 id="vpn">VPN</h2>
+
+<p>Get link from https://airtcp6.com/</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mkdir clash
+cd clash
+wget https://github.com/Dreamacro/clash/releases/download/v1.18.0/clash-linux-amd64-v1.18.0.gz
+gzip -d clash-linux-amd64-v1.18.0.gz
+mv clash-linux-amd64-v1.18.0 clash
+chmod +x clash
+wget -O config.yaml https://airchats.xyz/link/xxlFHIZsFzxkBaBHlapx?clash=1
+./clash -d .
+</code></pre></div></div>
+
+<h2 id="sftp">SFTP</h2>
+
+<p>https://linuxhint.com/setup-sftp-server-ubuntu/</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo apt install ssh
+sudo vim /etc/ssh/sshd_config
+</code></pre></div></div>
+
+<p>add the following to the end of the file:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Match group sftp
+ChrootDirectory /home
+X11Forwarding no
+AllowTcpForwarding no
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">ForceCommand internal-sftp</code> will disable SSH, which should not be included.</p>
+
+<p>restart, add group, add/modify user, change permission</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo systemctl restart ssh
+sudo addgroup sftp
+sudo useradd -m new_user_john -g sftp
+sudo passwd new_user_john
+sudo usermod -a -G sftp existing_user_tom
+sudo chmod 700 /home/new_user_john
+sudo chmod 700 /home/existing_user_tom/
+</code></pre></div></div>
+
+<p>Use FileZilla to connect.</p>
+
+<p>PS. The featured image for this post is generated using Stable Diffusion, whose full parameters with model link can be found at <a href="https://takin.ai/asset/6455aafde6c67aa57c19da16">Takin.AI</a>.</p>Harry WangDeploy Stable Diffusion for AI Image Generation2022-08-23T00:00:00+00:002022-08-23T00:00:00+00:00https://harrywang.github.io/diffusion<p><img class="mx-auto" src="https://github.com/harrywang/harrywang.github.io/assets/595772/0c08596a-1aef-479c-9755-aab42c137a91" /></p>
+
+<ul>
+  <li>Updated on 8/10/2023: added <a href="https://github.com/comfyanonymous/ComfyUI">ComfyUI</a> Mac M1 setup note</li>
+  <li>Updated on 3/4/2023: added WebUI Ubuntu setup note and link to WebUI Colab</li>
+  <li>Updated on 2/4/2023: added <a href="https://github.com/invoke-ai/InvokeAI">InvokeAI</a> instruction</li>
+  <li>Updated on 1/30/2023: use <a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Installation-on-Apple-Silicon">Stable Diffusion WebUI</a> instead given that DiffusionBee has issues loading custom models - check out my setup notes below - it may save you lots of time and trouble!</li>
+  <li>Updated on 1/16/2023: start to use the awesome offline stable diffusion app: <a href="https://diffusionbee.com/">DiffusionBee</a></li>
+  <li>Updated on 12/6/2022: add M1 deployment notes</li>
+</ul>
+
+<p>Stable Diffusion WebUI is my current go-to UI - it’s quite useful to go over the <a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Features">feature showcase page</a>.</p>
+
+<h2 id="setup-comfyui">Setup ComfyUI</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/comfyanonymous/ComfyUI.git
+cd ComfyUI
+python -m venv venv
+source venv/bin/activate
+pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu118 xformers
+pip install -r requirements.txt
+python main.py
+</code></pre></div></div>
+<p>Put your SD checkpoints (the huge ckpt/safetensors files) in: models/checkpoints</p>
+
+<p>Then, visit http://127.0.0.1:8188</p>
+
+<p><img class="mx-auto" src="https://github.com/harrywang/harrywang.github.io/assets/595772/585ec6f0-386f-4dcd-8dc7-de80dc0c0776" /></p>
+
+<h2 id="setup-stable-diffusion-webui">Setup Stable Diffusion WebUI</h2>
+
+<h3 id="ubuntu-webui-setup">Ubuntu WebUI Setup</h3>
+
+<p>Here are the notes for me to setup A1111 on my server:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git a1111
+cd a1111
+./webui.sh
+</code></pre></div></div>
+
+<p>Install extensions:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd a1111/extensions
+git clone https://github.com/Mikubill/sd-webui-controlnet.git
+git clone https://github.com/zanllp/sd-webui-infinite-image-browsing.git
+git clone https://github.com/Bing-su/sd-webui-tunnels.git
+git clone https://github.com/etherealxx/batchlinks-webui
+</code></pre></div></div>
+
+<p>Change startup script in <code class="language-plaintext highlighter-rouge">webui-user.sh</code> and add:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export COMMANDLINE_ARGS="--xformers --cloudflared --gradio-auth username:password"
+</code></pre></div></div>
+
+<p>Start A1111: <code class="language-plaintext highlighter-rouge">./webui.sh</code> and find the cloudflare link to login.</p>
+
+<p>Use Batchlinks Downloader to download models:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#controlnet
+https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monster/resolve/main/control_v1p_sd15_qrcode_monster.safetensors
+https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11e_sd15_ip2p.pth
+https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11e_sd15_shuffle.pth
+https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11f1e_sd15_tile.pth
+https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11f1p_sd15_depth.pth
+https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_canny.pth
+https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_inpaint.pth
+https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_lineart.pth
+https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_lineart.pth
+https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_mlsd.pth
+https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_mlsd.pth
+https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_normalbae.pth
+https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_openpose.pth
+https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_scribble.pth
+https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_seg.pth
+https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_softedge.pth
+https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15s2_lineart_anime.pth
+#model
+https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors
+https://civitai.com/api/download/models/8958
+https://civitai.com/api/download/models/113299
+https://civitai.com/api/download/models/6987?type=Model&amp;format=SafeTensor&amp;size=full&amp;fp=fp16
+https://civitai.com/api/download/models/5213?type=Model&amp;format=SafeTensor&amp;size=full&amp;fp=fp16
+https://civitai.com/api/download/models/94640?type=Model&amp;format=SafeTensor&amp;size=pruned&amp;fp=fp16
+https://civitai.com/api/download/models/40248
+https://civitai.com/api/download/models/15236?type=Model&amp;format=SafeTensor&amp;size=full&amp;fp=fp16
+https://civitai.com/api/download/models/57618
+https://civitai.com/api/download/models/106289
+#lora
+https://civitai.com/api/download/models/14856
+https://civitai.com/api/download/models/32988
+https://civitai.com/api/download/models/21173
+https://civitai.com/api/download/models/31284
+https://civitai.com/api/download/models/30384
+</code></pre></div></div>
+
+<h3 id="mac-webui-setup">Mac WebUI Setup</h3>
+
+<p>I ran into so many issues trying to set it up on my MacBook Pro M1 and finally made it work (Ubuntu setup is actually much easier - see below).</p>
+
+<p>The most important lesson learned: <strong>the Python version matters!</strong></p>
+
+<p>I figured this out from the inline comment <a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui/blob/2c1bb46c7ad5b4536f6587d327a03f0ff7811c5d/launch.py#L37">here</a> after having many issues with Python 3.8.0 and 3.9.7 - It would be helpful if the author can highlight this in the README file.</p>
+
+<p>I use <code class="language-plaintext highlighter-rouge">pyenv</code> to manage my Python versions and use the following commands to install Python 3.10.6 first.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv versions
+pyenv install 3.10.6
+pyenv global 3.10.6
+</code></pre></div></div>
+
+<ul>
+  <li>clone the repo: <code class="language-plaintext highlighter-rouge">git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git</code></li>
+  <li>download a checkpoint, such as stable diffusion 1.5 from <a href="https://huggingface.co/runwayml/stable-diffusion-v1-5">https://huggingface.co/runwayml/stable-diffusion-v1-5</a> and put the downloaded model in <code class="language-plaintext highlighter-rouge">/stable-diffusion-webui/models/Stable-diffusion/</code> folder.</li>
+  <li>switch to <code class="language-plaintext highlighter-rouge">stable-diffusion-webui</code> folder and run <code class="language-plaintext highlighter-rouge">./webui.sh</code></li>
+  <li>visit <a href="http://127.0.0.1:7860">http://127.0.0.1:7860</a> to use the tool</li>
+</ul>
+
+<p>It should be simple as the few steps above if the Python version is correct.</p>
+
+<blockquote>
+  <p>“Stable Diffusion 2.0 and 2.1 require both a model and a configuration file, and image width &amp; height will need to be set to 768 or higher when generating images”</p>
+</blockquote>
+
+<p>For using Stable Diffusion v2.0, follow the <a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Installation-on-Apple-Silicon">instruction</a> to download the checkpoints and yaml files.</p>
+
+<p>My <code class="language-plaintext highlighter-rouge">/stable-diffusion-webui/models/Stable-diffusion/</code> folder looks like the following:</p>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/215642669-92422d92-51f6-4389-afbe-3af37dd811b4.png" /></p>
+
+<p>Note: for v2.0, you may need to run <code class="language-plaintext highlighter-rouge">./webui.sh --no-half</code> or restart to make it work.</p>
+
+<p>for <code class="language-plaintext highlighter-rouge">768-v-ema.ckpt</code> SD v2.0, you have to use at least 768x768 or higher, e.g., 768x1024 to generate images otherwise you get garbage images shown below:</p>
+
+<ul>
+  <li>512x512 garbage result:</li>
+</ul>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/215643435-f65ada42-6c43-415c-9948-55b405eabb6c.png" /></p>
+
+<ul>
+  <li>768x768 result:</li>
+</ul>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/215643430-5d386c1c-4cb2-4f7a-98f0-3aefc6c3e272.png" /></p>
+
+<p>I want to record the issues I ran into below in case I need to refer to them later.</p>
+
+<ul>
+  <li>
+    <p>3.8.x has the following error (python 3.9.7 works but has other errors):</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>File "/Users/harrywang/.pyenv/versions/3.8.11/lib/python3.8/site-packages/ldm.py", line 20
+    print self.face_rec_model_path 
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print(self.face_rec_model_path)?
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>run into this <a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui/issues/4346">error</a>, removed the <code class="language-plaintext highlighter-rouge">k_diffusion_commit_hash</code> in <a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui/blob/master/launch.py#L302">launch.py</a></p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git_clone(k_diffusion_repo, repo_dir('k-diffusion'), "K-diffusion", k_diffusion_commit_hash)
+</code></pre></div>    </div>
+
+    <p>to</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  git_clone(k_diffusion_repo, repo_dir('k-diffusion'), "K-diffusion")
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>I have the following msg but I have not update to torch 1.13.1 yet - 1.12.1 seems to work fine so far.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>You are running torch 1.12.1.
+The program is tested to work with torch 1.13.1.
+To reinstall the desired version, run with commandline flag --reinstall-torch.
+Beware that this will cause a lot of large files to be downloaded, as well as
+there are reports of issues with training tab on the latest version.
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>run into the following errors - all seems to related to <code class="language-plaintext highlighter-rouge">mps</code>. I used <code class="language-plaintext highlighter-rouge">python launch.py  --skip-torch-cuda-test --no-half --use-cpu all</code> to launch to fix them - essentially don’t use <code class="language-plaintext highlighter-rouge">mps</code> and use <code class="language-plaintext highlighter-rouge">cpu</code> instead.</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NotImplementedError: The operator 'aten::frac.out' is not currently implemented for the MPS device. If you want this op to be added in priority during the prototype phase of this feature, please comment on https://github.com/pytorch/pytorch/issues/77764. As a temporary fix, you can set the environment variable `PYTORCH_ENABLE_MPS_FALLBACK=1` to use the CPU as a fallback for this op. WARNING: this will be slower than running natively on MPS.
+</code></pre></div>    </div>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>RuntimeError: "LayerNormKernelImpl" not implemented for 'Half'
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="ubuntu-webui-setup-1">Ubuntu WebUI Setup</h3>
+
+<p>Tested on Ubuntu 20.04.5 LTS, it’s as simple as the following two lines:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo apt install wget git python3 python3-venv
+bash &lt;(wget -qO- https://raw.githubusercontent.com/AUTOMATIC1111/stable-diffusion-webui/master/webui.sh)
+</code></pre></div></div>
+
+<p>Install xformers by editing <code class="language-plaintext highlighter-rouge">webui-user.sh</code> (see <a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui/discussions/5303">discussions</a>), then start WebUI using <code class="language-plaintext highlighter-rouge">./webui.sh</code> and xformers will be installed (for my new 4090, this did not work, adding <code class="language-plaintext highlighter-rouge">--xformers</code> worked):</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># Commandline arguments for webui.py, for example: export COMMANDLINE_ARGS="--medvram --opt-split-attention"
+export COMMANDLINE_ARGS="--reinstall-xformers"
+</code></pre></div></div>
+
+<p>Next, change <code class="language-plaintext highlighter-rouge">webui-user.sh</code> to remove the installation argument above (you only need to install it once) and enable xformers:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export COMMANDLINE_ARGS="--xformers"
+</code></pre></div></div>
+
+<p>To enable a public Gradio link with authentication, change <code class="language-plaintext highlighter-rouge">webui-user.sh</code> with arguments:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export COMMANDLINE_ARGS="--xformers --share --gradio-auth your-user-name:your-password"
+</code></pre></div></div>
+
+<p>To enable extension installation with <code class="language-plaintext highlighter-rouge">--share</code>, change <code class="language-plaintext highlighter-rouge">webui-user.sh</code> with arguments (otherwise this <a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui/issues/4215">error</a>):</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export COMMANDLINE_ARGS="--xformers --share --gradio-auth your-user-name:your-password --enable-insecure-extension-access"
+</code></pre></div></div>
+
+<p>If you have a server with a fixed IP address, say x.x.x.x, then you can use <code class="language-plaintext highlighter-rouge">--share</code> to run WebUI at <code class="language-plaintext highlighter-rouge">x.x.x.x:7860</code>.</p>
+
+<p>You can also install <a href="https://github.com/Bing-su/sd-webui-tunnels">webui tunnels plugin</a> to have a Cloudflare URL by running:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./webui.sh --gradio-auth username:password --cloudflared
+</code></pre></div></div>
+
+<p>To download a model:</p>
+
+<ul>
+  <li>
+    <p>find the checkpoint on Huggingface, such as <a href="https://huggingface.co/Lykon/DreamShaper/blob/main/DreamShaper_3.3_pruned.safetensors">DreamShaper</a></p>
+  </li>
+  <li>
+    <p>Get the download link (see below)</p>
+  </li>
+  <li>
+    <p>go to <code class="language-plaintext highlighter-rouge">/stable-diffusion-webui/models/Stable-diffusion</code> on the server and <code class="language-plaintext highlighter-rouge">wget https://huggingface.co/Lykon/DreamShaper/resolve/main/DreamShaper_3.3_pruned.safetensors</code></p>
+  </li>
+  <li>
+    <p>after <code class="language-plaintext highlighter-rouge">wget</code> civitai.com models, they need to be renamed.</p>
+  </li>
+</ul>
+
+<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/222912893-6bfa9afc-d334-496c-ba46-f80f1f3c4c05.png" /></p>
+
+<h3 id="install-dreambooth-extension">Install Dreambooth Extension</h3>
+
+<p>Note for installing https://github.com/d8ahazard/sd_dreambooth_extension</p>
+
+<p><strong>NOTE</strong>: “Once installed, you must restart the Stable-Diffusion WebUI completely. Reloading the UI will not install the necessary requirements.”</p>
+
+<p>Install <a href="https://github.com/kohya-ss/sd-webui-additional-networks">https://github.com/kohya-ss/sd-webui-additional-networks</a> to use the Lora Weights.</p>
+
+<p>Check out my <a href="https://harrywang.me/sd">tutorial</a> on how to use this extension.</p>
+
+<h3 id="webui-colab">WebUI Colab</h3>
+
+<p>You can use <a href="https://github.com/camenduru/stable-diffusion-webui-colab">https://github.com/camenduru/stable-diffusion-webui-colab</a> if you just want to use WebUI via Colab - Just run the chosen Colab Notebook (find the model you want to use) and you will get a URL to use WebUI - the speed is OK.</p>
+
+<h2 id="setup-invokeai">Setup InvokeAI</h2>
+
+<p>This is the my notes of installing <a href="https://github.com/invoke-ai/InvokeAI">InvokeAI</a> instruction on MacBook Pro M1. Tested with Python 3.10.6.</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">pip install .</code> installs packages using <code class="language-plaintext highlighter-rouge">pyproject.toml</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">invokeai-configure</code> asks you to download sd models</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/invoke-ai/InvokeAI.git
+cd InvokeAI
+python -m venv venv
+pip install --use-pep517 .
+invokeai-configure
+invokeai --web
+</code></pre></div></div>
+
+<p>Visit <a href="http://localhost:9090">http://localhost:9090</a> to use the UI.</p>
+
+<p>InvokeAI seems to take more resources than AUTOMATIC1111 Stable Diffusion WebUI below.</p>
+
+<h2 id="m1-stable-diffusion-deployment">M1 Stable Diffusion Deployment</h2>
+
+<p>I just followed the instructions <a href="https://github.com/apple/ml-stable-diffusion">here</a>.</p>
+
+<p>Tested on my 2020 MacBook Pro M1 with 16G RAM and Torch 1.13.0.</p>
+
+<p>Run the following to generate the models in <code class="language-plaintext highlighter-rouge">coreml-sd</code> folder:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/apple/ml-stable-diffusion.git
+cd ml-stable-diffusion
+conda create -n coreml_stable_diffusion python=3.8 -y
+conda activate coreml_stable_diffusion
+pip install -e .
+huggingface-cli login
+python -m python_coreml_stable_diffusion.torch2coreml --convert-unet --convert-text-encoder --convert-vae-decoder --convert-safety-checker -o coreml-sd
+</code></pre></div></div>
+
+<p>Generate image with Python and output to <code class="language-plaintext highlighter-rouge">image-outputs</code> folder:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python -m python_coreml_stable_diffusion.pipeline --prompt "a photo of an astronaut riding a horse on mars" -i coreml-sd -o image-outputs --compute-unit ALL --seed 93
+</code></pre></div></div>
+
+<p>The method above loads the model every time, which is quite slow (2-3 minutes). Use Swift to speed up model loading by setting up the Resources:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python -m python_coreml_stable_diffusion.torch2coreml --convert-unet --convert-text-encoder --convert-vae-decoder --convert-safety-checker --bundle-resources-for-swift-cli -o coreml-sd 
+</code></pre></div></div>
+
+<p>Then, generate image with Swift and output to <code class="language-plaintext highlighter-rouge">image-outputs</code> folder:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>swift run StableDiffusionSample "a photo of an astronaut riding a horse on mars" --resource-path coreml-sd/Resources/ --seed 93 --output-path image-outputs
+</code></pre></div></div>
+
+<h2 id="ubuntu-deployment">Ubuntu Deployment</h2>
+<p>In the past few months, I tried almost all popular text-to-image AI generation models/products, such as Dall-E 2, MidJourney, Disco Diffusion, Stable Diffusion, etc. Stable Diffusion checkpoint was just released a few days ago. I deployed one on my old GPU server and record my notes here for people who may also want to try. Machine creativity is a quite interesting research area for IS scholars and I jotted down some potential research topics in the end of this post as well.</p>
+
+<p>I first spent a few hours trying to set up <a href="https://github.com/CompVis/stable-diffusion">Stable Diffusion</a> on Mac M1 and failed - I cannot install the packages properly, e.g., version not found, dependency issues, etc. I found some successful attempts <a href="https://github.com/CompVis/stable-diffusion/issues/25">here</a> but have no time to try them yet.</p>
+
+<p>I ended up setting up Stable Diffusion on my old GPU server running Ubuntu and here are my notes.</p>
+
+<ul>
+  <li>Check Ubuntu Version</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lsb_release -a
+No LSB modules are available.
+Distributor ID:	Ubuntu
+Description:	Ubuntu 18.04.6 LTS
+Release:	18.04
+Codename:	bionic
+</code></pre></div></div>
+
+<ul>
+  <li>Check CUDA version: my GPU machine only has two 2080Ti with 11G VRAM each and CUDA 10.2</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nvidia-smi
+
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 440.100      Driver Version: 440.100      CUDA Version: 10.2     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|===============================+======================+======================|
+|   0  GeForce RTX 208...  Off  | 00000000:1A:00.0 Off |                  N/A |
+| 30%   27C    P8    20W / 250W |      1MiB / 11019MiB |      0%      Default |
++-------------------------------+----------------------+----------------------+
+|   1  GeForce RTX 208...  Off  | 00000000:68:00.0 Off |                  N/A |
+| 30%   26C    P8    19W / 250W |     73MiB / 11016MiB |      0%      Default |
++-------------------------------+----------------------+----------------------+
+</code></pre></div></div>
+
+<ul>
+  <li>
+    <p>Use <a href="https://github.com/basujindal/stable-diffusion">optimized fork</a>, which uses lesser VRAM than the original by sacrificing on inference speed <code class="language-plaintext highlighter-rouge">git clone https://github.com/basujindal/stable-diffusion</code> - I did this because I ran into <a href="https://github.com/CompVis/stable-diffusion/issues/39">CUDA out of memory issue</a> using the original repo.</p>
+  </li>
+  <li>
+    <p>Get the checkpoint file from <a href="https://huggingface.co/CompVis/stable-diffusion-v-1-4-original">HuggingFace Repo</a>. Download/Upload the checkpoint file to the server. I use <code class="language-plaintext highlighter-rouge">links</code> to browse websites and download files via terminal:</p>
+  </li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo apt install links
+links www.google.com
+</code></pre></div></div>
+
+<p>rename the checkpoint file to <code class="language-plaintext highlighter-rouge">model.ckpt</code> and put it in the following folder (create a new one):</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mkdir -p models/ldm/stable-diffusion-v1/
+</code></pre></div></div>
+
+<p>A side note on estimated training cost based on the reported GPU usage and the related AWS price I found:</p>
+
+<ul>
+  <li>Hardware Type: A100 PCIe 40GB</li>
+  <li>Hours used: 150000 (about 17.1 years)</li>
+  <li>Cloud Provider: AWS</li>
+</ul>
+
+<p>Price of p4d.24xlarge instance with 8 A100 with 40G VRAM:</p>
+
+<ul>
+  <li>32.77 USD (hourly)</li>
+  <li>19.22 USD (1-year reserved)</li>
+  <li>11.57 USD (3-year reserved)</li>
+</ul>
+
+<p>The training would cost between 225,000 USD and 600,000 USD.</p>
+
+<ul>
+  <li><strong>IMPORTANT</strong>: Switch to <code class="language-plaintext highlighter-rouge">stable-diffusion</code> folder and change to <code class="language-plaintext highlighter-rouge">cudatoolkit=10.2</code> to match my CUDA: <code class="language-plaintext highlighter-rouge">vim environment.yaml</code></li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>name: ldm
+channels:
+  - pytorch
+  - defaults
+dependencies:
+  - python=3.8.5
+  - pip=20.3
+  - cudatoolkit=10.2
+  - pytorch=1.11.0
+...
+</code></pre></div></div>
+
+<ul>
+  <li>Create a conda environment and activate it</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>conda env create -f environment.yaml
+conda activate ldm
+</code></pre></div></div>
+
+<p>Now, Stable Diffusion is ready to go and let’s see what AI will create based on the following text:</p>
+
+<blockquote>
+  <p>A car in 2050 designed by Antoni Gaudi</p>
+</blockquote>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python optimizedSD/optimized_txt2img.py --prompt "a car in 2050 designed by Antoni Gaudi" --H 512 --W 512 --seed 27 --n_iter 2 --n_samples 10 --ddim_steps 50
+</code></pre></div></div>
+<p>This whole area is relatively new and there are many potential interesting research topics, e.g.,</p>
+
+<ul>
+  <li>how humans work with AI creativity tools like Stable Diffusion (workflow shift? efficiency improvement? creativity boosting?…)</li>
+  <li>how to use AI to pick top n results generated from the same prompt, e.g., preference on cleaner background, less color, simpler composition, aesthetics scoring, etc.</li>
+  <li>how to do systemic/serendipitous prompt engineering to improve art creation novelty, efficiency, and quality by leveraging ideas from areas such as AutoML, recommender systems, and reinforcement learning.</li>
+</ul>
+
+<p>Anyway, out of the 20 generated images from the prompt above, the following are my top 3:</p>
+
+<p><img class="mx-auto" width="500" src="https://user-images.githubusercontent.com/595772/186077379-069a39fb-56a1-42b9-91ff-fbf8d0bc9503.png" /></p>
+
+<p><img class="mx-auto" width="500" src="https://user-images.githubusercontent.com/595772/186077382-894b90c3-fcf3-4ad5-a966-9d59121d3dbd.png" /></p>
+
+<p><img class="mx-auto" width="500" src="https://user-images.githubusercontent.com/595772/186077544-756a378a-5cb4-4dba-89b1-3898aceb6427.png" /></p>
+
+<p>PS. The featured image for this post is generated using Stable Diffusion, whose full parameters with model link can be found at <a href="https://takin.ai/asset/649054390a85d5e5ca42afce">Takin.AI</a>.</p>Harry WangManage Long-running Python Tasks using JupyterHub on Remote Ubuntu Server2022-08-05T00:00:00+00:002022-08-05T00:00:00+00:00https://harrywang.github.io/jupyter<p><img class="mx-auto" src="https://user-images.githubusercontent.com/595772/209896201-aa5d0ceb-c13c-466b-b791-2f6acca43c45.png" /></p>
+
+<p>I recently re-configured my Ubuntu server with JupyterHub so that I can manage a long-running Python task with a large dataset, which cannot be handled by my MacBook Pro. I spent quite some time figuring out how to do certain things right and decide to write it down before I forget.</p>
+
+<p>The task was a sentiment analysis of ~1.4 million hotel reviews using our fine-tuned model based on <a href="https://huggingface.co/IDEA-CCNL/Erlangshen-Roberta-330M-Sentiment">Erlangshen-Roberta-330M-Sentiment</a>, which took about 10 days to complete using my old CPU server. I developed a simplified version of the program to demo in this tutorial.</p>
+
+<p>The data and code can be found in this <a href="https://github.com/harrywang/hf-sentiment-analysis">repo</a>.</p>
+
+<p>The following are the key parts:</p>
+
+<ul>
+  <li>install JupyterHub on the server</li>
+  <li>install <code class="language-plaintext highlighter-rouge">pyenv</code> to manage different versions of Python</li>
+  <li>setup and add virtual environments to <code class="language-plaintext highlighter-rouge">ipykernel</code> so that they are accessible from JupyterLab</li>
+  <li>use a HuggingFace model to do a zero-shot sentiment analysis</li>
+  <li>run a long-running Python task without keeping the terminal open and with logging and email notification</li>
+  <li>check GPU usages and terminate tasks</li>
+</ul>
+
+<h2 id="jupyterhub-setup-and-sftp">JupyterHub Setup and SFTP</h2>
+
+<p>Our system admin used this <a href="https://github.com/jupyterhub/jupyterhub-the-hard-way/blob/HEAD/docs/installation-guide-hard.md">tutorial</a> to set up the JupyterHub and added my account to the <code class="language-plaintext highlighter-rouge">sudo</code> group.</p>
+
+<p>For small files, I just use JupyterLab interface to upload them to the server. For large files, I use <a href="https://filezilla-project.org/">FileZilla</a> to upload.</p>
+
+<h2 id="python-versions">Python Versions</h2>
+
+<p>Different python versions might be needed for different projects. I use <a href="https://github.com/pyenv/pyenv">pyenv</a> to manage Python versions. The following is my note for setting up pyenv on Ubuntu server, refer to <a href="https://harrywang.medium.com/how-to-setup-mac-for-python-development-37e5fd895151">my Mac tutorial</a> if needed.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ssh hjwang@128.175.21.xxx  # ssh to the remote server
+sudo apt update -y  # update apt
+sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git  # install dependencies
+git clone https://github.com/pyenv/pyenv.git ~/.pyenv  # clone the repo
+echo 'export PYENV_ROOT="$HOME/.pyenv"' &gt;&gt; ~/.bashrc  # setup environment
+echo 'export PATH="$PYENV_ROOT/bin:$PATH"' &gt;&gt; ~/.bashrc  # setup environment
+echo -e 'if command -v pyenv 1&gt;/dev/null 2&gt;&amp;1; then\n eval "$(pyenv init -)"\nfi' &gt;&gt; ~/.bashrc  # setup environment
+exec "$SHELL"  # restart the shell
+pyenv install --list  # available versions to install 
+pyenv versions  # installed versions
+pyenv install 3.9.1  # install a Python version
+pyenv global 3.9.1  # set global python version to use
+</code></pre></div></div>
+
+<p>Now if I type <code class="language-plaintext highlighter-rouge">python</code>, I see Python 3.9.1:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Python 3.9.1 (default, Aug  5 2022, 16:07:24) 
+[GCC 7.5.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+&gt;&gt;&gt; 
+</code></pre></div></div>
+
+<h2 id="virtual-environments">Virtual Environments</h2>
+
+<p>Setup and activate a virtual environment (here I put all virtual environments in the folder <code class="language-plaintext highlighter-rouge">venv</code> and this sample one is named <code class="language-plaintext highlighter-rouge">ml</code>):</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python -m venv venv/ml
+source venv/ml/bin/activate
+</code></pre></div></div>
+<p>Next, while the virtual environment is activated, we need to add it to ipykernel so that we can access it via JupyterLab:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip install ipykernel
+sudo env "PATH=$PATH VIRTUAL_ENV=$VIRTUAL_ENV" python -m ipykernel install --name=ml
+</code></pre></div></div>
+
+<p>Then, you can use <code class="language-plaintext highlighter-rouge">jupyter kernelspec list</code> to check all available kernels and remove the corresponding folder to delete the kernel if needed.</p>
+
+<p>Now, the new virtual environment (kernel) can be used when creating new notebooks:</p>
+
+<p><img class="mx-auto" width="400" src="https://user-images.githubusercontent.com/595772/183214749-6f93ee12-d59e-466a-8482-c7e211b19692.png" /></p>
+
+<h2 id="long-running-python-tasks">Long-running Python Tasks</h2>
+
+<ul>
+  <li>create a virtual environment and install the packages specified in <a href="https://github.com/harrywang/hf-sentiment-analysis/blob/main/requirements.txt"><code class="language-plaintext highlighter-rouge">requirements.txt</code></a>:</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+</code></pre></div></div>
+
+<ul>
+  <li>create a <code class="language-plaintext highlighter-rouge">.env</code> file in the root of the project folder to store the environment variables the program needs - setup the SendGrid API key and from/to emails in your <a href="https://sendgrid.com/">SendGrid account</a>:</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SENDGRID_API_KEY='SG.t1o-xxxx'
+FROM_EMAIL='your_from_email'
+TO_EMAIL='your_to_email'
+</code></pre></div></div>
+
+<ul>
+  <li>
+    <p>the sample hotel review text (in Chinese) csv is provided <a href="https://github.com/harrywang/hf-sentiment-analysis/blob/main/hotel-reviews.csv">here</a></p>
+  </li>
+  <li>
+    <p>the sample python sentiment analysis script is <a href="https://github.com/harrywang/hf-sentiment-analysis/blob/main/sentiment-analysis.py">here</a></p>
+  </li>
+</ul>
+
+<p>The program will calculate the sentiment of each review and generate a new csv file as the result. The small sample has only 500 rows. The processed result is saved every 100 rows and an email notification is sent out every 200 rows.</p>
+
+<p>I use this program to show:</p>
+
+<ul>
+  <li>how to call a HuggingFace model (NOTE: if the repo is private, you must get a token from HuggingFace and run <code class="language-plaintext highlighter-rouge">huggingface-cli login</code> with token first and the code also needs to be changed to use token - see my inline comments for details).</li>
+  <li>how to log the result using Python logging</li>
+  <li>how to send out email notifications using SendGrid (you need to get an API token)</li>
+</ul>
+
+<p>To run the program in the background, you can ssh to the server or use the terminal from JupyterLab, activate the virtual environment, then execute:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nohup python sentiment-analysis.py &amp;
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">&amp;</code> asks the terminal to return control to you immediately and allows the command to complete in the background (<a href="https://serverfault.com/questions/402496/what-does-the-ampersand-symbol-mean-with-nohup">source</a>).</p>
+
+<p>The program will keep on running even if you close the terminal or close JupyterLab.</p>
+
+<p>Two files will be generated:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">log.txt</code> has the logging info - note that the timestamp is added automatically.</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>INFO: 08/05/2022 06:44:49 data loaded
+INFO: 08/05/2022 06:44:55 model loaded
+...
+</code></pre></div></div>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">nohup.out</code> will have all outputs of the <code class="language-plaintext highlighter-rouge">print()</code> function.</li>
+</ul>
+
+<p>Three email notifications will also be sent:</p>
+
+<p><img class="mx-auto" width="400" src="https://user-images.githubusercontent.com/595772/183221322-13637c22-f245-4d73-9a96-f1a74bf22913.png" /></p>
+
+<p>The logging and email notifications are very useful for long-running tasks so that I know the program is still working fine or from where to restart if something went wrong.</p>
+
+<h2 id="terminate-programs">Terminate Programs</h2>
+
+<p>Sometimes you may want to terminate a running program for whatever reasons, e.g., the program is taking too much GPU and you need to release the GPU resources.</p>
+
+<p>You can check GPU usage using <code class="language-plaintext highlighter-rouge">nvtop</code>: install the package using <code class="language-plaintext highlighter-rouge">sudo apt install nvtop</code> and then run <code class="language-plaintext highlighter-rouge">nvtop</code></p>
+
+<p>You can list all processes by user name using <code class="language-plaintext highlighter-rouge">ps -u [username]</code>, such as:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ps -u hjwang
+  PID TTY          TIME CMD
+ 3558 ?        00:00:02 sshd
+ 3559 pts/0    00:00:00 bash
+ 4592 ?        00:00:00 sshd
+ 4593 ?        00:00:00 sftp-server
+ 5060 pts/0    00:00:00 ps
+ 5707 ?        00:00:00 systemd
+ 5708 ?        00:00:00 (sd-pam)
+ 5720 ?        00:02:32 jupyterhub-sing
+22112 ?        01:17:52 python
+</code></pre></div></div>
+<p>then you can terminate a process using its ID: <code class="language-plaintext highlighter-rouge">kill 22112</code> (gracefully) or <code class="language-plaintext highlighter-rouge">kill -9 22112</code> (forcefully and immediately)</p>
+
+<p><code class="language-plaintext highlighter-rouge">ps</code> means process status:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">-e</code>: view all the running processes</li>
+  <li><code class="language-plaintext highlighter-rouge">-f</code>: view full-format listing</li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">|</code> pipe a command that lets you use two or more commands such that output of one command serves as input to the next. <code class="language-plaintext highlighter-rouge">grep</code> is a command-line utility for searching plain-text data sets for lines that match a regular expression.</p>
+
+<p><code class="language-plaintext highlighter-rouge">ps -ef | grep python</code> can be use to show all running processes with python.</p>
+
+<p>PS. The image for this post is generated via <a href="https://www.midjourney.com/">Midjourney</a> using the prompt “a giant cloud server in matrix calculating difficult problems”.</p>Harry Wang

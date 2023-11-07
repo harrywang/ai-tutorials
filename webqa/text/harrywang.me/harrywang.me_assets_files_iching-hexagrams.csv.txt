@@ -1,0 +1,65 @@
+name,hexagram
+The Creative / 乾,111111
+The Receptive / 坤,222222
+Difficulty at the Beginning / 屯,212221
+Youthful Folly / 蒙,122212
+Waiting (Nourishment) / 需, 12111
+Conflict / 讼,111212
+The Army / 师,222212
+Holding Together [union] / 比,212222
+The Taming Power of the Small / 小畜,112111
+Treading [conduct] / 履,111211
+Peace / 泰,222111
+Standstill [Stagnation] / 否,111222
+Fellowship with Men / 同人,111121
+Possession in Great Measure / 大有,121111
+Modesty / 谦,222122
+Enthusiasm / 豫,221222
+Following / 随,211221
+Work on what has been spoiled [ Decay ] / 蛊,122112
+Approach / 临,222211
+Contemplation (View) / 观,112222
+Biting Through / 噬嗑,121221
+Grace / 贲,122121
+Splitting Apart / 剥,122222
+Return (The Turning Point) / 复,222221
+Innocence (The Unexpected) / 无妄,111221
+The Taming Power of the Great / 大畜,122111
+Comers of the Mouth (Providing Nourishment) / 颐,122221
+Preponderance of the Great / 大过,211112
+The Abysmal (Water) / 坎,212212
+"The Clinging, Fire / 离",121121
+Influence (Wooing) / 咸,211122
+Duration / 恒,221112
+Retreat / 遁,111122
+The Power of the Great / 大壮,221111
+Progress / 晋,121222
+Darkening of the light / 明夷,222121
+The Family [The Clan] / 家人,112121
+Opposition / 睽,121211
+Obstruction / 蹇,212122
+Deliverance / 解,221212
+Decrease / 损,122211
+Increase / 益,112221
+Break-through (Resoluteness) / 夬,211111
+Coming to Meet / 姤,111112
+Gathering Together [Massing] / 萃,211222
+Pushing Upward / 升,222112
+Oppression (Exhaustion) / 困,211212
+The Well / 井,212112
+Revolution (Molting) / 革,211121
+The Caldron / 鼎,121112
+"The Arousing (Shock, Thunder) / 震",221221
+"Keeping Still, Mountain / 艮",122122
+Development (Gradual Progress) / 渐,112122
+The Marrying Maiden / 归妹,221211
+Abundance [Fullness] / 丰收,221121
+The Wanderer / 旅,121122
+"The Gentle (The Penetrating, Wind) / 巽",112112
+"The Joyous, Lake / 兑",211211
+Dispersion [Dissolution] / 涣,112212
+Limitation / 节,212211
+Inner Truth / 中孚,112211
+Preponderance of the Small / 小过,221122
+After Completion / 既济,212121
+Before Completion / 未济,121212

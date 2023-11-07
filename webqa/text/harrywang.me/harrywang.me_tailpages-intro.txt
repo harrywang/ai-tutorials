@@ -1,0 +1,148 @@
+
+
+
+
+
+
+
+
+
+
+
+
+Tailpages (Tailwind + Github Pages) | harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Open menu
+
+
+
+
+
+
+
+
+
+
+                    Home
+                
+
+
+
+                        About
+                    
+
+
+                        Blog
+                    
+
+
+
+
+
+January 20, 2022
+Tailpages (Tailwind + Github Pages)
+
+
+
+tutorial
+
+
+open-source
+
+
+
+
+
+My team started to use Tailwind CSS a few months ago and I want to learn a little bit more about it so that I don’t feel like a complete idiot in some technical discussions :). So, I started a small project to design a Jekyll template using TailwindCSS.
+Tailpages (Tailwind + Github Pages) is a Jekyll website template based on TailwindCSS, which can be hosted by Github for free. You can visit the demo site at https://harrywang.me/tailpages/.
+
+Key features are:
+
+Minimalist design inspired by the indigo template
+Elegant typography via TailwindCSS Typography plugin and Inter font
+Markdown support for content authoring (static pages and blogs)
+Code highlighting and styling via highlight.js (see code example)
+Latex support via MathJax (see an example)
+Table of Contents support via jekyll-toc (see an example)
+
+Tutorials
+
+No-code Tutorial: this tutorial shows how you can use Tailpages template to quickly setup your website and blogs without coding, which you can access at medium or blog.
+Technical Tutorial: this tutorial shows how to setup the development environment for Tailpages from scratch, which you can access at medium or blog.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      © 
+
+        Powered by Tailpages
+      
+
+
+
+
+
+
+

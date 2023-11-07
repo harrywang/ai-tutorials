@@ -1,0 +1,140 @@
+
+
+
+
+
+
+
+
+
+
+
+
+My Budget PC Build | harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Open menu
+
+
+
+
+
+
+
+
+
+
+                    Home
+                
+
+
+
+                        About
+                    
+
+
+                        Blog
+                    
+
+
+
+
+
+June 17, 2023
+My Budget PC Build
+
+
+
+tutorial
+
+
+
+I replaced my old 2080ti GPU with a 4090 in my remote server and built a PC so that I can still use the 2080ti locally. I followed this great YouTube video and the process was quite easy.
+I bought all parts from Amazon and the total is $583:
+
+Motherboard: MSI B550-A PRO ProSeries Motherboard - $140
+CPU: AMD Ryzen™ 5 5600 with Cooler - $129
+RAM (16G): T-Force Vulcan Z DDR4 16GB Kit - $34
+SSD (2T): Kingston NV2 2TB M.2 2280 NVMe Internal SSD - $85
+Power Supply Unit (PSU): 750W Fully Modular RGB Power Supply - $80
+Case: NZXT H5 Flow Compact ATX Mid-Tower PC Gaming Case - White - $95
+USB Wifi: TP-Link AC1300 USB WiFi Adapter - $20
+
+I then made a bootable USB from ISO image using Rufus and installed Windows 11. The PC is very quiet and nice-looking :).
+
+PS. The featured image for this post is generated using Stable Diffusion, whose full parameters with model link can be found at Takin.AI.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      © 
+
+        Powered by Tailpages
+      
+
+
+
+
+
+
+

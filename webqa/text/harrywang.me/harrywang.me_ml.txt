@@ -1,0 +1,246 @@
+
+
+
+
+
+
+
+
+
+
+
+
+A Minimalist End-to-End Machine Learning Tutorial | harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Open menu
+
+
+
+
+
+
+
+
+
+
+                    Home
+                
+
+
+
+                        About
+                    
+
+
+                        Blog
+                    
+
+
+
+
+
+March 3, 2022
+A Minimalist End-to-End Machine Learning Tutorial
+
+
+
+tutorial
+
+
+open-source
+
+
+coding
+
+
+
+
+      Table of Contents
+    
+
+
+Local SetupFull ML PipelineData AppAutoEDA and AutoMLMLOpsNo-Code ML
+
+This tutorial is developed based on teaching materials from my courses at the University of Delaware and my professional training workshops for industry practitioners. Many of the tools have been/are being used by data scientists and machine learning engineers in my teams. My goal is to have a minimalistic coverage of key concepts and steps in a typical end-to-end machine learning project with open-source/free tools, simple datasets, and well-documented coding examples.
+The key topics include:
+
+Full machine learning pipeline (Numpy, Pandas, Matplotlib, Seaborn - see my other tutorial, Scikit-learn)
+Data app development and deployment (Streamlit)
+AutoEDA (Pandas-profiling) and AutoML (AutoGluon)
+MLOps, experiment tracking and automation (ClearML)
+No-Code machine learning (Rapidminer)
+
+All data files, notebooks, models are in the code repo.
+Local Setup
+Tested on Python 3.9.7 (refer to my tutorial on setting up Python development environment on Mac)
+Clone the repo, switch to the repo folder, setup the virtual environment, and install the required packages as follows:
+git clone https://github.com/harrywang/mini-ml.git
+cd mini-ml
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+Then run jupyter lab or code . (if use VSCode) to go over the notebooks.
+Back to Top
+Full ML Pipeline
+The mini-ml.ipynb notebook demonstrates the following key steps of an end-to-end machine learning project with detailed inline comments and Markdown cells:
+
+Exploratory Data Analysis (EDA)
+Data pre-processing and pipeline
+Model building, evaluation, tuning, and selection
+Feature importance analysis and feature selection
+Model persistence
+
+Note that the focus is to show the overall workflow not to build the best performing model.
+You can run the notebook directly from Kaggle.
+Back to Top
+Data App
+After training a model using the pipeline shown above, you can deploy the model in the cloud to make predictions.
+Streamlit enables fast data app development and deployment using Python with no front‑end experience required.
+streamlit-app.py shows how to read the model generated from the mini-ml.ipynb notebook and create an interactive data app with a nice UI:
+
+See the demo app live at:
+
+Streamlit Cloud
+Heroku
+
+Follow the steps below to get the data app running locally for testing:
+
+Run mini-ml.ipynb notebook to generate the model file clf-best.pickle
+Make sure the virtual environment is activated: source venv/bin/activate
+Run the app from the root of the repo folder using terminal: streamlit run streamlit-app.py, then open a browser to visit the app at http://localhost:8501
+Stop the app by using Ctrl + C or closing the terminal
+
+Follow my tutorial to deploy the app to the cloud for public access via services such as Streamlit Share, Heroku, or AWS.
+Back to Top
+AutoEDA and AutoML
+The automl.ipynb notebook shows how you can conduct automatic EDA with pandas_profiling and AutoML with autogluon.
+With a few lines of code, pandas_profiling can generate a comprehensive EDA report:
+
+autogluon can automatically train and tune many models and generate a leaderboard to show the model performance (NOTE: I use autogluon.tabular to support Mac with M1 chip - some packages, such as CatBoost, do not support M1 chip yet. A full version of autogluon is used in the Kaggle version):
+autogluon.tabular version tries 8 models:
+
+autogluon full version tries 14 models:
+
+Although autogluon and other similar AutoML packages/systems can produce good performing models with minimal effort, the results are often generated in a “black box” fashion. It is still critical to learn EDA techniques and machine learning algorithms/pipelines as shown in the mini-ml.ipynb notebook to better understand the results and conduct additional model tuning and selection.
+A good practice is to use these packages to get a good performance benchmark before trying other models with potential more data collection and feature engineering.
+Back to Top
+MLOps
+MLOps is very important for systematic tracking, management, and deployment of ML/AI projects. When training AI models, many experiments are conducted to apply different datasets, hyperparameters, epochs, etc. Without a MLOps system, it’s very difficult, if not impossible, to keep track of the settings of the experiments, compare results, and automate executions. In clearml-sklearn.ipynb and clearml-pytorch.py, I demonstrate how to use ClearMl to do experiment tracking.
+I have used other similar products, such as WandB and choose ClearML for a few reasons:
+
+It’s open-source
+It’s super easy to set up and non-intrusive to your code
+We have deployed ClearML for our AI team in Shanghai to use since early 2021 (even before they changed the name from Allegro Trains to ClearML).
+
+Follow the steps below to setup ClearML and run the programs:
+
+Sign up an account at https://clear.ml/ and create clearml credentials at https://app.clear.ml/settings/workspace-configuration
+
+
+
+
+run clearml-init and follow the setup instructions, a new configuration file will be created at ~/clearml.conf
+restart JupyterLab or VSCode if needed to load the new configuration file
+run clearml-sklearn.ipynb notebook to train a decision tree classifier and an SVM classifier and log the experiment parameters and performance results.
+
+
+
+
+run python clearml-pytorch.py to see another example on training a deep learning model (the well-known MNIST handwritten recognition algorithm) using PyTorch
+
+Back to Top
+No-Code ML
+I use RapidMiner to teach basic machine learning to less technical audiences, such as product managers, executives, MBA students, etc. RapidMiner Studio Free version is enough, which has 10,000 data rows limit.
+In the rapidminer folder, I created a no-code version of the mini-ml.ipynb notebook using RapidMiner (v9.10).
+
+mini-ml.rmp is the training process, where two models, i.e., decision tree and random forest, are trained using typical CV with a Grid Search for a simple classification problem.
+
+
+Create a new process and import mini-ml.rmp as follows:
+
+Then, select the Read CSV operator and change csv file path to the titanic.csv in the repo folder:
+
+Click the run button to finish the training process and the resulting decision tree model is saved as mini-ml-model.ioo as found in the rapidminer folder.
+
+
+mini-ml-predict.rmp is the prediction process, where the mini-ml-model.ioo decision tree model generated by the mini-ml.rmp process above is loaded to make predictions.
+
+
+Back to Top
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      © 
+
+        Powered by Tailpages
+      
+
+
+
+
+
+
+

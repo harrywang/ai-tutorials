@@ -1,0 +1,144 @@
+
+
+
+
+
+
+
+
+
+LaTex Support | Tailpages: Tailwind + Github Pages
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Tailpages: Tailwind + Github Pages
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Open menu
+
+
+
+
+
+
+
+
+
+
+                    Home
+                
+
+
+
+                        About
+                    
+
+
+                        Bitcoin
+                    
+
+
+                        Blog
+                    
+
+
+
+
+
+LaTex Support
+
+
+
+tutorial
+
+
+open-source
+
+
+Latex support is based on MathJax.
+Enclose the LaTex formula in $$...$$. Some examples:
+
+
+
+\(y^{x}\)
+y^{x}
+\(y_{x}\)
+y_{x}
+
+
+\(\frac{x}{y}\)
+\frac{x}{y}
+\(\sum_{k=1}^n\)
+\sum_{k=1}^n
+
+
+\(\sqrt[n]{x}\)
+\sqrt[n]{x}
+\(\prod_{k=1}^n\)
+\prod_{k=1}^n
+
+
+
+See more examples at here
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      © 
+
+        Powered by Tailpages
+      
+
+
+
+
+
+
+

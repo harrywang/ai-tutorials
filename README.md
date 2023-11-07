@@ -1,4 +1,7 @@
-# langchain-tutorials
+# AI Tutorials
+
+A set of AI tutorials I found online and revised.
+
 
 ```
 python -m venv env

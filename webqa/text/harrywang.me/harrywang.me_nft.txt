@@ -1,0 +1,174 @@
+
+
+
+
+
+
+
+
+
+
+
+
+When Data Science Meets NFT | harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Open menu
+
+
+
+
+
+
+
+
+
+
+                    Home
+                
+
+
+
+                        About
+                    
+
+
+                        Blog
+                    
+
+
+
+
+
+April 23, 2022
+When Data Science Meets NFT
+
+
+
+dataset
+
+
+open-source
+
+
+teaching
+
+
+crypto
+
+
+
+TL;DR
+I created an open dataset for the Crypto Coven NFT collection using OpenSea API and my scripts (it took about 4 hours to download all images), which can be used to teach/practice various topics, such as exploratory data analysis, time series analysis, data visualization, predictive analytics, text mining, and image analytics via deep learning.
+The dataset can be accessed at Kaggle. I also added some simple code notebooks and look forward to more contributions from the community:
+
+NFT Sales Price Prediction using AutoML
+Witch Image Similarity using Tensorflow and Scikit-learn
+
+
+Analysis Examples
+I have used this dataset for assignments in the undergraduate data analytics and machine learning courses I teach.
+I list some analysis examples here.
+
+
+What’s the percentage of witches that have not been sold at all?
+50%
+
+
+Find the top 10 addresses holding most witches. Based on the average sales price, how much those witches are worth?
+This address 0xa1707c82aa2866955991c7f2c6f431d6619b8b4c owns 162 witches, which are worth ~ $595,801 based on the average sales price in the past. Check out this address on OpenSea: https://opensea.io/Divine_Femininity
+
+
+Which is the most expensive witch ever sold (before 4/21/2022)? Who bought it?
+It’s her, bought for $39,772 on January 25, 2022 by https://opensea.io/kaiynne2. 
+  
+
+
+Plot the daily sales price and weekly moving average to understand the NFT investment cycles.
+
+
+
+Find witches who look alike
+Witch image features are extracted using pre-trained Xception model and similar images are calculated using cosine similarity and the top N nearest neighbors are returned.
+See some results (I did not know there are smoker witches ^_^ before this analysis):
+
+
+
+
+I hope you find this dataset interesting and useful and use it in your teaching and learning.
+PS. I made the witch collage shown at the top of this post using the images in this dataset, which can be downloaded from Figma.com.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      © 
+
+        Powered by Tailpages
+      
+
+
+
+
+
+
+

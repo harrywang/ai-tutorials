@@ -1,0 +1,247 @@
+
+
+
+
+
+
+
+
+
+
+
+
+Blog | harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Open menu
+
+
+
+
+
+
+
+
+
+
+                    Home
+                
+
+
+
+                        About
+                    
+
+
+
+
+
+Blog
+
+
+MVP (large language Model + Vector database + Prompt engineering)
+July 14, 2023
+
+
+Headless Wordpress + Next.js + ElasticSearch
+July 9, 2023
+
+
+My Budget PC Build
+June 17, 2023
+
+
+Publish NPM and PyPI Packages
+April 20, 2023
+
+
+Setup Websites using SiteGround
+March 10, 2023
+
+
+What I Learned About Fine-tuning Stable Diffusion
+February 18, 2023
+
+
+Zero-shot Image Classification and Semantic Image Search using CLIP and Unsplash Dataset
+January 15, 2023
+
+
+My Ubuntu Command Cheatsheet
+August 25, 2022
+
+
+Deploy Stable Diffusion for AI Image Generation
+August 23, 2022
+
+
+Manage Long-running Python Tasks using JupyterHub on Remote Ubuntu Server
+August 5, 2022
+
+
+CloseSea - the Smallest NFT Marketplace
+June 9, 2022
+
+
+A Practical Guide to Quasi-Experimental Methods (PSM and DID)
+June 1, 2022
+
+
+Self-Made Millionaire in 30 Minutes :)
+May 1, 2022
+
+
+When Data Science Meets NFT
+April 23, 2022
+
+
+A Web3 Fullstack DApp
+April 1, 2022
+
+
+A Minimalist End-to-End Machine Learning Tutorial
+March 3, 2022
+
+
+Get Test Ethers using Selenium
+February 22, 2022
+
+
+Introduction to Python Data Science Tools
+February 10, 2022
+
+
+LaTex Cheatsheet
+February 9, 2022
+
+
+Python Cheatsheet
+February 8, 2022
+
+
+Tailpages (Tailwind + Github Pages)
+January 20, 2022
+
+
+Tailpages No-Code Tutorial
+January 19, 2022
+
+
+Tailpages Technical Tutorial
+January 18, 2022
+
+
+A Maple Slab
+December 16, 2021
+
+
+Generative Art using Python and AxiDraw Pen Plotter
+July 18, 2021
+
+
+Color + Culture + AI
+February 13, 2021
+
+
+A Shed
+August 11, 2020
+
+
+The Cube of Changes
+May 12, 2020
+
+
+Calligraphy + Art + AI
+May 9, 2020
+
+
+FRED (Flask + REact + Docker)
+April 10, 2020
+
+
+I Ching: Book of Changes
+November 13, 2019
+
+
+The Nakashima Lounge Chair
+October 1, 2019
+
+
+A Minimalist End-to-End Scrapy Tutorial
+September 7, 2019
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      © 
+
+        Powered by Tailpages
+      
+
+
+
+
+
+
+

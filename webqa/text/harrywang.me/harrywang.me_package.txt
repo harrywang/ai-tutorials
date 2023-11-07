@@ -1,0 +1,153 @@
+
+
+
+
+
+
+
+
+
+
+
+
+Publish NPM and PyPI Packages | harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Open menu
+
+
+
+
+
+
+
+
+
+
+                    Home
+                
+
+
+
+                        About
+                    
+
+
+                        Blog
+                    
+
+
+
+
+
+April 20, 2023
+Publish NPM and PyPI Packages
+
+
+
+tutorial
+
+
+
+This post is also for myself - I often want to register packages to https://www.npmjs.com/ and/or https://pypi.org/ and keep on looking for instructions that I forget. Please refer to the two great tutorials in the references section for details. I only list the key steps and notes that I often need to refer to below.
+Setup Github Repo for the Package
+The easiest way to start is to find an example repo and revise the package information:
+
+https://github.com/harrywang/greeter-node (NPM): package info in package.json
+https://github.com/harrywang/greeter-python (PyPI): package info is in setup.py. You also need to change package folder name to be consistent.
+
+Package and Publish
+You need to register accounts on https://www.npmjs.com/ and https://pypi.org/.
+For NPM:
+npm install
+npm login
+npm publish
+
+Then, you should see your published package, e.g., https://www.npmjs.com/package/harry-greeter
+For PyPI:
+Find classifier (such as supported licenses) from https://pypi.org/classifiers/ for setup.py, then:
+python setup.py sdist
+twine upload dist/*
+
+Then, you should see your published package, e.g., https://pypi.org/project/harrywang-greeter/
+References
+
+Step by step: Building and publishing an NPM Typescript package
+How to Publish an Open-Source Python Package to PyPI
+
+PS. The featured image for this post is generated using Stable Diffusion, whose full parameters with model link can be found at Takin.AI.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      © 
+
+        Powered by Tailpages
+      
+
+
+
+
+
+
+

@@ -1,0 +1,154 @@
+
+
+
+
+
+
+
+
+
+
+
+
+FRED (Flask + REact + Docker) | harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Open menu
+
+
+
+
+
+
+
+
+
+
+                    Home
+                
+
+
+
+                        About
+                    
+
+
+                        Blog
+                    
+
+
+
+
+
+April 10, 2020
+FRED (Flask + REact + Docker)
+
+
+
+tutorial
+
+
+open-source
+
+
+FRED (Flask + REact + Docker): An End-to-End Boilerplate for Full Stack Development
+Github: https://github.com/harrywang/fred
+Heroku Demo: https://getfred.herokuapp.com (I am using the free dyno, which may take a few seconds to start and load)
+
+Tools and packages used in this project:
+
+Flask: a micro web framework written in Python
+React: a JavaScript library for building user interfaces
+Docker: a set of platform as a service products that uses OS-level virtualization to deliver software in packages called containers
+Postgres: a free and open-source relational database management system
+SQLAlchemy: an open-source SQL toolkit and object-relational mapper for Python
+Flask-RESTX: a Flask extension for building REST APIs
+PyTest: a Python testing framework
+Jest: a JavaScript testing framework
+Python Linting and Formatting: flake8, black, isort
+JS Linting and Formatting: ESLint and Prettier
+JSON Web Tokens (JWT) via flask-bcrypt and pyjwt
+Bulma: a free, open source, and modern CSS framework
+Fresh: a beautiful Bulma template by CSSNinja
+Illustrations from UnDraw.co
+Images from Unsplash
+Heroku: a platform as a service (PaaS) that enables developers to build, run, and operate applications entirely in the cloud.
+CircleCI: a continuous integration and delivery platform
+AWS (TODO)
+
+Check Github for more details.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      © 
+
+        Powered by Tailpages
+      
+
+
+
+
+
+
+

@@ -1,0 +1,228 @@
+
+
+
+
+
+
+
+
+
+
+
+
+My Ubuntu Command Cheatsheet | harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Open menu
+
+
+
+
+
+
+
+
+
+
+                    Home
+                
+
+
+
+                        About
+                    
+
+
+                        Blog
+                    
+
+
+
+
+
+August 25, 2022
+My Ubuntu Command Cheatsheet
+
+
+
+tutorial
+
+
+
+This is a simple Ubuntu command cheatsheet for myself.
+GPU
+
+Use NVIDIA System Management Interface (nvidia-smi):
+
+$ nvidia-smi
+Thu Jun 22 11:28:07 2023       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 525.116.04   Driver Version: 525.116.04   CUDA Version: 12.0     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  NVIDIA GeForce ...  On   | 00000000:67:00.0 Off |                  Off |
+|  0%   48C    P8    29W / 450W |   3997MiB / 24564MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|    0   N/A  N/A     43171      C   python3                          3994MiB |
++-----------------------------------------------------------------------------+
+
+
+Check GPU usage using nvtop: install the package using sudo apt install nvtop and then run nvtop
+
+File System
+
+
+ps means process status:
+
+-u: list all processes by user name:
+-e: view all the running processes
+
+-f: view full-format listing
+  ps -u hjwang
+  PID TTY          TIME CMD
+  3558 ?        00:00:02 sshd
+  3559 pts/0    00:00:00 bash
+  ...
+  22112 ?        01:17:52 python
+ 
+
+
+|: pipe a command that lets you use two or more commands such that output of one command serves as input to the next. grep is a command-line utility for searching plain-text data sets for lines that match a regular expression.
+ps -ef | grep python can be use to show all running processes with python.
+
+kill PID: terminate a process using its ID: kill 22112 (gracefully) or kill -9 22112 (forcefully and immediately)
+du -sh *: list the sizes of all files and sub-folders.
+tree: print the directory tree in terminal: install using sudo apt-get install tree
+
+OS
+
+Show OS version: lsb_release -a
+
+Python
+Change pip source:
+
+https://pypi.tuna.tsinghua.edu.cn/simple
+https://mirrors.aliyun.com/pypi/simple
+
+pip config set global.index-url https://mirrors.aliyun.com/pypi/simple
+Writing to /home/sedy/.config/pip/pip.conf
+
+VPN
+Get link from https://airtcp6.com/
+mkdir clash
+cd clash
+wget https://github.com/Dreamacro/clash/releases/download/v1.18.0/clash-linux-amd64-v1.18.0.gz
+gzip -d clash-linux-amd64-v1.18.0.gz
+mv clash-linux-amd64-v1.18.0 clash
+chmod +x clash
+wget -O config.yaml https://airchats.xyz/link/xxlFHIZsFzxkBaBHlapx?clash=1
+./clash -d .
+
+SFTP
+https://linuxhint.com/setup-sftp-server-ubuntu/
+sudo apt install ssh
+sudo vim /etc/ssh/sshd_config
+
+add the following to the end of the file:
+Match group sftp
+ChrootDirectory /home
+X11Forwarding no
+AllowTcpForwarding no
+
+ForceCommand internal-sftp will disable SSH, which should not be included.
+restart, add group, add/modify user, change permission
+sudo systemctl restart ssh
+sudo addgroup sftp
+sudo useradd -m new_user_john -g sftp
+sudo passwd new_user_john
+sudo usermod -a -G sftp existing_user_tom
+sudo chmod 700 /home/new_user_john
+sudo chmod 700 /home/existing_user_tom/
+
+Use FileZilla to connect.
+PS. The featured image for this post is generated using Stable Diffusion, whose full parameters with model link can be found at Takin.AI.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      © 
+
+        Powered by Tailpages
+      
+
+
+
+
+
+
+

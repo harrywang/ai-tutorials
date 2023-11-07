@@ -1,0 +1,150 @@
+
+
+
+
+
+
+
+
+
+
+
+
+About Me | harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+harrywang.me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Open menu
+
+
+
+
+
+
+
+
+
+
+                    Home
+                
+
+
+
+                        Blog
+                    
+
+
+
+
+
+About Me
+Hi, my name is Harry Wang (Chinese: 王建楠). I am a Full Professor of Management Information Systems at the University of Delaware with more than 15 years’ research, teaching, and management experience in AI, business intelligence and analytics, business process management, and enterprise systems. I am also an affiliated faculty at the Data Science Institute and the Institute for Financial Services Analytics.
+I currently serve as the Chief Scientist of Tezign (a unicorn tech startup based in Shanghai backed by VC firms like Sequoia Capital, Hearst Ventures, and Temasek) and an Independent Director for So-Young International Inc. (NASDAQ: SY - the largest social community in China for consumers, professionals, and service providers in the medical aesthetics industry).
+I was the Founding Director of OneConnect (NYSE: OCFT) US Research Institute based in New York City from 2018 to 2019 and the VP of Technology for the Association for Information Systems from 2015 to 2018. I was one of the founding members of the Institute for Financial Services Analytics at the University of Delaware and a JPMorgan Chase Fellow from 2014 to 2018. I also founded Conferency in 2015 to provide SaaS solutions for academic conferences.
+In my spare time, I enjoy coding, sports, music, design, art, and woodworking (check out some of my hobby projects).
+Recent Projects and Tutorials
+
+Tailpages (Tailwind + Github Pages): a Jekyll website template based on TailwindCSS, which can be hosted by Github for free.
+A Minimalist End-to-End Machine Learning Tutorial: a set of notebooks covering key basic components of real-world machine learning projects
+Generative Art via Python: how to make generative art using Python and AxiDraw Pen Plotter
+Color + Culture + AI: culture-inspired multi-modal color palette generation and colorization
+Calligraphy + AI: abstract art generation based on Chinese calligraphy
+FRED (Flask + REact + Docker): an end-to-end boilerplate for full stack development
+A Minimalist End-to-End Scrapy Tutorial: my most popular tutorial on web scraping with >130K views since posted in September 2019.
+
+Recent Teaching
+
+Machine Learning for Business
+Full-Stack Development
+
+Selected Publications
+
+“Enhanced Seq2Seq Autoencoder via Contrastive Learning for Abstractive Text Summarization” (with Rachel Zheng, Kunpeng Zhang, Ling Fan, and Zhe Wang), IEEE Big Data 2021 (arXiv link).
+“Topic-Guided Abstractive Text Summarization: a Joint Learning Approach” (with Chujie Zheng, Kunpeng Zhang, Ling Fan, and Zhe Wang), 2021 
+(arXiv link).
+“Unifying Online and Offline Preference for Social Link Prediction” (with Fan Zhou, Bangying Wu, Kunpeng Zhang, and Yi Yang), INFORMS Journal on Computing, Volume 33, Issue 4, 2021.
+“Peer Effects in Competitive Environments: Field Experiments on Information Provision and Interventions” (with Zhuoxin Li and Gang Wang), MIS Quarterly, Vol. 45 Issue 1, p163-191, 2021.
+“A Two-Phase Approach for Abstractive Podcast Summarization” (with Chujie Zheng, Kunpeng Zhang, and Ling Fan), Text REtrieval Conference (TREC) Podcasts Track, 2020 (arXiv link).
+“A Baseline Analysis for Podcast Abstractive Summarization” (with Chujie Zheng, Kunpeng Zhang, and Ling Fan), Workshop on Podcast Recommendations, ACM Recommender Systems Conference (RecSys), 2020 (arXiv link).
+“A Framework and Dataset for Abstract Art Generation via CalligraphyGAN” (with Jinggang Zhuo and Ling Fan), NeurIPS Workshop on Machine Learning for Creativity and Design, Vancouver, Canada, 2020 (arXiv link).
+“Recommendation with diversity: an adaptive trust-aware model” (with Ting Yu, Wenhua Li, Junpeng Guo, and Ling Fan), Decision Support Systems, 2019.
+“An intelligent conversation engineering framework for developing dialogue systems,” Winter Conference on Business Analytics, March 7-9, Snowbird, Utah, 2019.
+“The OneConn-MemNN System for Knowledge-Grounded Conversation Modeling,” (with Junyuan Zheng, Surya Kasturi, Mason Lin, Xin Chen, and Onkar Salvi), The Thirty-Third AAAI Conference on Artificial Intelligence (AAAI-19), January 27-February 1, Honolulu, Hawaii, USA, 2019.
+“Personalized recommendation based on time-weighted overlapping community detection,” (with Haoyuan Feng, Jin Tian, and Minqiang Li), Information and Management, Volume 52, Issue 7, 2015, Pages 789–800.
+“An Analytical Framework for Understanding Knowledge Sharing Processes in Online Q&A Communities,” (with G. Alan Wang, Jiexun Li, Weiguo Fan, and Alan Abrahams), ACM Transactions on Management Information Systems, Volume 5 Issue 4, 2015.
+“An Intelligent Approach to Data Extraction and Task Identification for Process Mining,” (with Jiexun Li and Xue Bai), Information Systems Frontiers, Volume 17, Issue 6, pp 1195-1208, 2015.
+“On Risk Management with Information Flows in Business Processes,” (with Xue Bai, Ramayya Krishnan, and Rema Padman), Information Systems Research, Volume 24, Issue 3, pp. 731-749, 2013.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      © 
+
+        Powered by Tailpages
+      
+
+
+
+
+
+
+
