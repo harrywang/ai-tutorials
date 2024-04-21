@@ -1,0 +1,8 @@
+langchain
+langsmith
+langchainhub
+langchain-openai
+tiktoken
+pandas
+duckduckgo-search
+python-dotenv

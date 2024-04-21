@@ -1,0 +1,5 @@
+pyautogen
+python-dotenv
+matplotlib
+numpy
+yfinance
